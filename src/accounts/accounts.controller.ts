@@ -7,8 +7,8 @@ import {
   Post,
   Delete,
 } from '@nestjs/common';
-import { UpdateAccountDto } from './dto/updateAccount.dto';
-import { CreateAccountDto } from './dto/create.account.dto';
+import { UpdateAccountDto } from './dto/update-account.dto';
+import { CreateAccountDto } from './dto/create-account.dto';
 import { ApiUseTags } from '@nestjs/swagger';
 
 @ApiUseTags('accounts')
@@ -30,7 +30,10 @@ export class AccountsController {
   }
 
   @Patch()
-  updateAccount(@Param('id') id, @Body() updateAccountDto: UpdateAccountDto) {
+  updateAccount(
+    @Param('id') id: string,
+    @Body() updateAccountDto: UpdateAccountDto,
+  ) {
     return 'returns updated account';
   }
 
