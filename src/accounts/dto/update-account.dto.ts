@@ -11,11 +11,6 @@ export class UpdateAccountDto {
   @IsString()
   @IsOptional()
   @ApiModelPropertyOptional()
-  readonly name?: string;
-
-  @IsString()
-  @IsOptional()
-  @ApiModelPropertyOptional()
   readonly firstName?: string;
 
   @IsString()
