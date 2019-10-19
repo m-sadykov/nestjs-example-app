@@ -2,11 +2,21 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { LogginInterceptor } from './logging.insterceptor';
+import { Logger, createLogger, transports, format } from 'winston';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  const logger: Logger = createLogger({
+    level: 'info',
+    format: format.json(),
+    defaultMeta: { service: 'app-module' },
+    transports: [new transports.Console()],
+  });
+
   app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalInterceptors(new LogginInterceptor(logger));
 
   const options = new DocumentBuilder()
     .setTitle('Accounts managing service')
