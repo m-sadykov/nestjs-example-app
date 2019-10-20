@@ -29,6 +29,6 @@ export class AccountsService {
   }
 
   async delete(id): Promise<void> {
-    return this.accountModel.findByIdAndRemove(id);
+    return this.accountModel.findByIdAndUpdate(id, { isDeleted: true });
   }
 }
