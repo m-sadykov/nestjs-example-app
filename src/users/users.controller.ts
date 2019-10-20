@@ -7,8 +7,10 @@ import {
   Patch,
   Delete,
 } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
 import { ApiUseTags, ApiResponse } from '@nestjs/swagger';
-import { UsersService } from './users.service';
+import { MongodDbService } from '../mongo-db.service';
+import { Model } from 'mongoose';
 import { User } from './interface/user';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -16,18 +18,21 @@ import { UpdateUserDto } from './dto/update-user.dto';
 @ApiUseTags('users')
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    @InjectModel('User') private readonly userModel: Model<User>,
+    private readonly dbService: MongodDbService,
+  ) {}
 
   @Get()
   @ApiResponse({ status: 200, type: [User] })
-  getAll() {
-    return this.usersService.getAll();
+  async getAll(): Promise<User[]> {
+    return this.dbService.getAll(this.userModel);
   }
 
   @Get(':id')
   @ApiResponse({ status: 200, type: User })
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(id);
+  async findOne(@Param('id') id: string): Promise<User> {
+    return this.dbService.findOne(this.userModel, id);
   }
 
   @Post()
@@ -36,8 +41,8 @@ export class UsersController {
     type: User,
     description: 'User has been successfully created.',
   })
-  createUser(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+  async createUser(@Body() createUserDto: CreateUserDto): Promise<User> {
+    return this.dbService.create(this.userModel, createUserDto);
   }
 
   @Patch(':id')
@@ -46,8 +51,11 @@ export class UsersController {
     type: User,
     description: 'User has been successfully updated.',
   })
-  updateUser(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(id, updateUserDto);
+  async updateUser(
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ): Promise<User> {
+    return this.dbService.update(this.userModel, id, updateUserDto);
   }
 
   @Delete(':id')
@@ -55,7 +63,7 @@ export class UsersController {
     status: 200,
     description: 'User has bee successfully removed',
   })
-  removeUser(@Param('id') id: string) {
-    return this.usersService.delete(id);
+  async removeUser(@Param('id') id: string): Promise<void> {
+    return this.dbService.delete(this.userModel, id);
   }
 }

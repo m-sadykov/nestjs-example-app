@@ -7,27 +7,32 @@ import {
   Post,
   Delete,
 } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
 import { UpdateAccountDto } from './dto/update-account.dto';
 import { CreateAccountDto } from './dto/create-account.dto';
 import { ApiUseTags, ApiResponse } from '@nestjs/swagger';
-import { AccountsService } from './accounts.service';
+import { MongodDbService } from '../mongo-db.service';
+import { Model } from 'mongoose';
 import { Account } from './interface/account';
 
 @ApiUseTags('accounts')
 @Controller('accounts')
 export class AccountsController {
-  constructor(private readonly accountsService: AccountsService) {}
+  constructor(
+    @InjectModel('Account') private readonly accountModel: Model<Account>,
+    private readonly dbService: MongodDbService,
+  ) {}
 
   @Get()
   @ApiResponse({ status: 200, type: [Account] })
-  getAll() {
-    return this.accountsService.getAll();
+  async getAll(): Promise<Account[]> {
+    return this.dbService.getAll(this.accountModel);
   }
 
   @Get(':id')
   @ApiResponse({ status: 200, type: Account })
-  findOne(@Param('id') id: string) {
-    return this.accountsService.findOne(id);
+  async findOne(@Param('id') id: string): Promise<Account> {
+    return this.dbService.findOne(this.accountModel, id);
   }
 
   @Post()
@@ -39,7 +44,7 @@ export class AccountsController {
   async createAccount(
     @Body() createAccountDto: CreateAccountDto,
   ): Promise<Account> {
-    return this.accountsService.create(createAccountDto);
+    return this.dbService.create(this.accountModel, createAccountDto);
   }
 
   @Patch(':id')
@@ -48,11 +53,11 @@ export class AccountsController {
     description: 'Account has been successfully updated.',
     type: Account,
   })
-  updateAccount(
+  async updateAccount(
     @Param('id') id: string,
     @Body() updateAccountDto: UpdateAccountDto,
-  ) {
-    return this.accountsService.update(id, updateAccountDto);
+  ): Promise<Account> {
+    return this.dbService.update(this.accountModel, id, updateAccountDto);
   }
 
   @Delete(':id')
@@ -60,7 +65,7 @@ export class AccountsController {
     status: 200,
     description: 'Account has been successfully removed.',
   })
-  removeAccount(@Param('id') id: string) {
-    return this.accountsService.delete(id);
+  async removeAccount(@Param('id') id: string): Promise<void> {
+    return this.dbService.delete(this.accountModel, id);
   }
 }
