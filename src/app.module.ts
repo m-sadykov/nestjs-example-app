@@ -6,6 +6,7 @@ import { ConfigModule } from '../config/config.module';
 
 import { AccountsModule } from './accounts/accounts.module';
 import { RolesModule } from './roles/roles.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { RolesModule } from './roles/roles.module';
     }),
     AccountsModule,
     RolesModule,
+    UsersModule,
   ],
   controllers: [],
   providers: [],
