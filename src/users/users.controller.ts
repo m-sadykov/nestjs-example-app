@@ -8,34 +8,40 @@ import {
   Delete,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { ApiUseTags, ApiResponse } from '@nestjs/swagger';
+import { ApiUseTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { MongodDbService } from '../mongo-db.service';
 import { Model } from 'mongoose';
 import { User } from './interface/user';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { Roles } from '../auth/roles.decorator';
 
+@ApiBearerAuth()
 @ApiUseTags('users')
 @Controller('users')
 export class UsersController {
   constructor(
-    @InjectModel('User') private readonly userModel: Model<User>,
+    @InjectModel('User')
+    private readonly userModel: Model<User>,
     private readonly dbService: MongodDbService,
   ) {}
 
   @Get()
+  @Roles(['admin', 'writer'])
   @ApiResponse({ status: 200, type: [User] })
   async getAll(): Promise<User[]> {
     return this.dbService.getAll(this.userModel);
   }
 
   @Get(':id')
+  @Roles(['admin', 'writer'])
   @ApiResponse({ status: 200, type: User })
   async findOne(@Param('id') id: string): Promise<User> {
     return this.dbService.findOne(this.userModel, id);
   }
 
   @Post()
+  @Roles(['admin'])
   @ApiResponse({
     status: 201,
     type: User,
@@ -46,6 +52,7 @@ export class UsersController {
   }
 
   @Patch(':id')
+  @Roles(['admin'])
   @ApiResponse({
     status: 200,
     type: User,
@@ -59,6 +66,7 @@ export class UsersController {
   }
 
   @Delete(':id')
+  @Roles(['admin'])
   @ApiResponse({
     status: 200,
     description: 'User has bee successfully removed',

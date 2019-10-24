@@ -7,3 +7,8 @@ export class User {
   @ApiModelProperty()
   password: string;
 }
+
+export interface AuthenticatedUser {
+  username: string;
+  roles: string[];
+}

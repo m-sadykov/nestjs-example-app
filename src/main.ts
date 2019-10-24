@@ -1,9 +1,10 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { LogginInterceptor } from './logging.insterceptor';
 import { Logger, createLogger, transports, format } from 'winston';
+import { AuthGuard } from './auth/auth.guard';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -15,12 +16,16 @@ async function bootstrap() {
     transports: [new transports.Console()],
   });
 
+  const reflector = new Reflector();
+
   app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalGuards(new AuthGuard(reflector));
   app.useGlobalInterceptors(new LogginInterceptor(logger));
 
   const options = new DocumentBuilder()
     .setTitle('Accounts managing service')
     .setVersion('1.0')
+    .addBearerAuth('Authorization', 'header', 'basic')
     .build();
 
   const document = SwaggerModule.createDocument(app, options);

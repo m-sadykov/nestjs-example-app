@@ -13,8 +13,10 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Role } from './interface/roles.interface';
 import { MongodDbService } from '../mongo-db.service';
-import { ApiUseTags, ApiResponse } from '@nestjs/swagger';
+import { ApiUseTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { Roles } from '../auth/roles.decorator';
 
+@ApiBearerAuth()
 @ApiUseTags('roles')
 @Controller('roles')
 export class RolesController {
@@ -24,18 +26,21 @@ export class RolesController {
   ) {}
 
   @Get()
+  @Roles(['admin', 'writer'])
   @ApiResponse({ status: 200, type: [Role] })
   async getAll(): Promise<Role[]> {
     return this.dbService.getAll(this.roleModel);
   }
 
   @Get(':id')
+  @Roles(['admin', 'writer'])
   @ApiResponse({ status: 200, type: Role })
   async findOne(@Param('id') id: string): Promise<Role> {
     return this.dbService.findOne(this.roleModel, id);
   }
 
   @Post()
+  @Roles(['admin'])
   @ApiResponse({
     status: 201,
     type: Role,
@@ -46,6 +51,7 @@ export class RolesController {
   }
 
   @Patch(':id')
+  @Roles(['admin'])
   @ApiResponse({
     status: 200,
     type: Role,
@@ -59,6 +65,7 @@ export class RolesController {
   }
 
   @Delete(':id')
+  @Roles(['admin'])
   @ApiResponse({
     status: 200,
     description: 'Role has bee successfully removed',

@@ -1,11 +1,13 @@
 import { Controller, Get, Param, Post, Body, Delete } from '@nestjs/common';
-import { ApiUseTags, ApiResponse } from '@nestjs/swagger';
+import { ApiUseTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { UserRoleRel } from './interface/user-role-rel.interface';
 import { MongodDbService } from '../mongo-db.service';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateRelDto } from './dto/create-rel.dto';
+import { Roles } from '../auth/roles.decorator';
 
+@ApiBearerAuth()
 @ApiUseTags('user-role-rel')
 @Controller('user-role-rel')
 export class UserRoleRelController {
@@ -16,12 +18,14 @@ export class UserRoleRelController {
   ) {}
 
   @Get()
+  @Roles(['admin', 'writer'])
   @ApiResponse({ status: 200, type: [UserRoleRel] })
   getAll(): Promise<UserRoleRel[]> {
     return this.dbService.getAll(this.relationModel);
   }
 
   @Get(':accountId')
+  @Roles(['admin', 'writer'])
   @ApiResponse({ status: 200, type: UserRoleRel })
   getUserRoleRelByAccountId(
     @Param('accountId') accountId: string,
@@ -30,6 +34,7 @@ export class UserRoleRelController {
   }
 
   @Post()
+  @Roles(['admin'])
   @ApiResponse({
     status: 201,
     type: UserRoleRel,
@@ -40,11 +45,12 @@ export class UserRoleRelController {
   }
 
   @Delete(':id')
+  @Roles(['admin'])
   @ApiResponse({
     status: 200,
     description: 'User role relation has bee successfully removed',
   })
-  async emoveRel(@Param('id') id: string): Promise<void> {
+  async removeRel(@Param('id') id: string): Promise<void> {
     return this.dbService.delete(this.relationModel, id);
   }
 }

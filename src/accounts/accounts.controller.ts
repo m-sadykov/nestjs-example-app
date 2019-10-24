@@ -10,11 +10,13 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { UpdateAccountDto } from './dto/update-account.dto';
 import { CreateAccountDto } from './dto/create-account.dto';
-import { ApiUseTags, ApiResponse } from '@nestjs/swagger';
+import { ApiUseTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { MongodDbService } from '../mongo-db.service';
 import { Model } from 'mongoose';
 import { Account } from './interface/account';
+import { Roles } from '../auth/roles.decorator';
 
+@ApiBearerAuth()
 @ApiUseTags('accounts')
 @Controller('accounts')
 export class AccountsController {
@@ -24,18 +26,21 @@ export class AccountsController {
   ) {}
 
   @Get()
+  @Roles(['admin', 'writer', 'reader'])
   @ApiResponse({ status: 200, type: [Account] })
   async getAll(): Promise<Account[]> {
     return this.dbService.getAll(this.accountModel);
   }
 
   @Get(':id')
+  @Roles(['admin', 'writer', 'reader'])
   @ApiResponse({ status: 200, type: Account })
   async findOne(@Param('id') id: string): Promise<Account> {
     return this.dbService.findOne(this.accountModel, id);
   }
 
   @Post()
+  @Roles(['admin', 'writer'])
   @ApiResponse({
     status: 201,
     description: 'Account has been successfully created.',
@@ -48,6 +53,7 @@ export class AccountsController {
   }
 
   @Patch(':id')
+  @Roles(['admin', 'writer'])
   @ApiResponse({
     status: 200,
     description: 'Account has been successfully updated.',
@@ -61,6 +67,7 @@ export class AccountsController {
   }
 
   @Delete(':id')
+  @Roles(['admin', 'writer'])
   @ApiResponse({
     status: 200,
     description: 'Account has been successfully removed.',
