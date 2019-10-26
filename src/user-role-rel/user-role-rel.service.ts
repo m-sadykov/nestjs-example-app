@@ -9,4 +9,16 @@ export class UserRoleRelService {
     @InjectModel('UserRoleRel')
     private readonly relationModel: Model<UserRoleRel>,
   ) {}
+
+  async isUserRoleRelAlreadyExists(createRel: UserRoleRel): Promise<boolean> {
+    const query = createRel;
+
+    const [relation] = await this.relationModel.find(query);
+
+    if (relation) {
+      return true;
+    }
+
+    return false;
+  }
 }

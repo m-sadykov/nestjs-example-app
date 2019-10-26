@@ -23,7 +23,10 @@ async function bootstrap() {
   app.useGlobalInterceptors(new LogginInterceptor(logger));
 
   const options = new DocumentBuilder()
-    .setTitle('Accounts managing service')
+    .setTitle('Nest.js example app')
+    .setDescription(
+      'User auto generated admin user credentials to authenticte into swagger',
+    )
     .setVersion('1.0')
     .addBearerAuth('Authorization', 'header', 'basic')
     .build();

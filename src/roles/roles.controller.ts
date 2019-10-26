@@ -6,6 +6,7 @@ import {
   Body,
   Patch,
   Delete,
+  BadRequestException,
 } from '@nestjs/common';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
@@ -15,6 +16,7 @@ import { Role } from './interface/roles.interface';
 import { MongodDbService } from '../mongo-db.service';
 import { ApiUseTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { Roles } from '../auth/roles.decorator';
+import { RolesService } from './roles.service';
 
 @ApiBearerAuth()
 @ApiUseTags('roles')
@@ -23,6 +25,7 @@ export class RolesController {
   constructor(
     @InjectModel('Role') private readonly roleModel: Model<Role>,
     private readonly dbService: MongodDbService,
+    private readonly rolesSerivce: RolesService,
   ) {}
 
   @Get()
@@ -46,7 +49,15 @@ export class RolesController {
     type: Role,
     description: 'Role has been successfully created.',
   })
-  createRole(@Body() createRoleDto: CreateRoleDto): Promise<Role> {
+  async createRole(@Body() createRoleDto: CreateRoleDto): Promise<Role> {
+    const { name } = createRoleDto;
+
+    const isRoleExists = await this.rolesSerivce.isRoleAlreadyExists(name);
+
+    if (isRoleExists) {
+      throw new BadRequestException(`Role name ${name} already exists.`);
+    }
+
     return this.dbService.create(this.roleModel, createRoleDto);
   }
 
@@ -57,7 +68,7 @@ export class RolesController {
     type: Role,
     description: 'Role has been successfully updated.',
   })
-  updateRole(
+  async updateRole(
     @Param('id') id: string,
     @Body() updateRoleDto: UpdateRoleDto,
   ): Promise<Role> {
@@ -70,7 +81,7 @@ export class RolesController {
     status: 200,
     description: 'Role has bee successfully removed',
   })
-  removeRole(@Param(':id') id: string): Promise<void> {
+  async removeRole(@Param(':id') id: string): Promise<void> {
     return this.dbService.delete(this.roleModel, id);
   }
 }

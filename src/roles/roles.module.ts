@@ -5,6 +5,7 @@ import { RolesController } from './roles.controller';
 import { MongodDbService } from '../mongo-db.service';
 import { AuthMiddleware } from '../auth/auth.middleware';
 import { UsersModule } from '../users/users.module';
+import { RolesService } from './roles.service';
 
 @Module({
   imports: [
@@ -12,7 +13,7 @@ import { UsersModule } from '../users/users.module';
     UsersModule,
   ],
   controllers: [RolesController],
-  providers: [MongodDbService],
+  providers: [MongodDbService, RolesService],
 })
 export class RolesModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

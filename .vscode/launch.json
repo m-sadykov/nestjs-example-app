@@ -1,0 +1,27 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch with transpilation",
+      "type": "node",
+      "request": "launch",
+      "args": ["${workspaceFolder}/src/main.ts"],
+      "env": {
+        "TS_NODE_TRANSPILE_ONLY": "true"
+      },
+      "runtimeArgs": ["--nolazy", "-r", "ts-node/register"],
+      "sourceMaps": true,
+      "cwd": "${workspaceRoot}",
+      "protocol": "inspector"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "NestJS Test",
+      "program": "${workspaceFolder}/dist/src/main.js"
+    }
+  ]
+}

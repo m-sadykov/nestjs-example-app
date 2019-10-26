@@ -36,4 +36,16 @@ export class UsersService {
       throw new UnauthorizedException();
     }
   }
+
+  async isUserAlreadyExists(username: string): Promise<boolean> {
+    const query = { username };
+
+    const [user] = await this.userModel.find(query);
+
+    if (user) {
+      return true;
+    }
+
+    return false;
+  }
 }

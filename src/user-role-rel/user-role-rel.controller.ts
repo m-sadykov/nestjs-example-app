@@ -1,4 +1,12 @@
-import { Controller, Get, Param, Post, Body, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  Post,
+  Body,
+  Delete,
+  BadRequestException,
+} from '@nestjs/common';
 import { ApiUseTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { UserRoleRel } from './interface/user-role-rel.interface';
 import { MongodDbService } from '../mongo-db.service';
@@ -6,15 +14,17 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateRelDto } from './dto/create-rel.dto';
 import { Roles } from '../auth/roles.decorator';
+import { UserRoleRelService } from './user-role-rel.service';
 
 @ApiBearerAuth()
 @ApiUseTags('user-role-rel')
 @Controller('user-role-rel')
 export class UserRoleRelController {
   constructor(
-    private readonly dbService: MongodDbService,
     @InjectModel('UserRoleRel')
     private readonly relationModel: Model<UserRoleRel>,
+    private readonly dbService: MongodDbService,
+    private readonly relationService: UserRoleRelService,
   ) {}
 
   @Get()
@@ -40,7 +50,21 @@ export class UserRoleRelController {
     type: UserRoleRel,
     description: 'User role relation has been successfully created.',
   })
-  createUserRoleRel(@Body() createRelDto: CreateRelDto): Promise<UserRoleRel> {
+  async createUserRoleRel(
+    @Body() createRelDto: CreateRelDto,
+  ): Promise<UserRoleRel> {
+    const isRelExists = await this.relationService.isUserRoleRelAlreadyExists(
+      createRelDto,
+    );
+
+    if (isRelExists) {
+      throw new BadRequestException(
+        `Relation with userId ${createRelDto.userId} roleId ${
+          createRelDto.roleId
+        } already exists.`,
+      );
+    }
+
     return this.dbService.create(this.relationModel, createRelDto);
   }
 

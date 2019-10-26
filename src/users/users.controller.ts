@@ -6,6 +6,7 @@ import {
   Body,
   Patch,
   Delete,
+  BadRequestException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ApiUseTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
@@ -15,6 +16,7 @@ import { User } from './interface/user';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Roles } from '../auth/roles.decorator';
+import { UsersService } from './users.service';
 
 @ApiBearerAuth()
 @ApiUseTags('users')
@@ -24,6 +26,7 @@ export class UsersController {
     @InjectModel('User')
     private readonly userModel: Model<User>,
     private readonly dbService: MongodDbService,
+    private readonly usersService: UsersService,
   ) {}
 
   @Get()
@@ -48,6 +51,13 @@ export class UsersController {
     description: 'User has been successfully created.',
   })
   async createUser(@Body() createUserDto: CreateUserDto): Promise<User> {
+    const { username } = createUserDto;
+    const isUserExists = await this.usersService.isUserAlreadyExists(username);
+
+    if (isUserExists) {
+      throw new BadRequestException(`User ${username} already exists`);
+    }
+
     return this.dbService.create(this.userModel, createUserDto);
   }
 

@@ -17,20 +17,18 @@ export class LogginInterceptor implements NestInterceptor {
     const request: Request = context.switchToHttp().getRequest();
 
     return next.handle().pipe(
-      tap(
-        this.logSuccess.bind(this, request),
-        catchError(error => {
-          const isHandled = Boolean(error.status);
+      tap(this.logSuccess.bind(this, request)),
+      catchError(error => {
+        const isHandled = Boolean(error.statusCode);
 
-          if (isHandled) {
-            this.logSuccess(request);
-          } else {
-            this.logError(request, error);
-          }
+        if (isHandled) {
+          this.logSuccess(request);
+        } else {
+          this.logError(request, error);
+        }
 
-          return throwError(error);
-        }),
-      ),
+        return throwError(error);
+      }),
     );
   }
 
@@ -48,8 +46,8 @@ export class LogginInterceptor implements NestInterceptor {
   }
 
   private requestToJSON(request: Request) {
-    const { method, originalUrl: url, body, headers } = request;
+    const { method, originalUrl: url, headers } = request;
 
-    return { method, url, headers, body };
+    return { method, url, headers };
   }
 }
