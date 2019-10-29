@@ -2,7 +2,6 @@ import {
   Injectable,
   NestMiddleware,
   UnauthorizedException,
-  BadRequestException,
 } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 import { UsersService } from '../users/users.service';
@@ -15,15 +14,15 @@ class IdentityAccessError extends Error {
   }
 }
 
-interface AuthenticatedRequest extends Request {
-  user: any;
-}
+export type AuthenticatedRequest = {
+  [key: string]: any;
+};
 
 @Injectable()
 export class AuthMiddleware implements NestMiddleware {
   constructor(private readonly usersSerice: UsersService) {}
 
-  async use(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  async use(req: AuthenticatedRequest, next: NextFunction) {
     const authHeaders = req.headers.authorization;
 
     if (!authHeaders) {
@@ -31,7 +30,7 @@ export class AuthMiddleware implements NestMiddleware {
     }
 
     try {
-      const [username, password] = this.getAuthorizationCredentials(
+      const [username, password] = await this.getAuthorizationCredentials(
         authHeaders,
       );
 
@@ -39,12 +38,11 @@ export class AuthMiddleware implements NestMiddleware {
 
       next();
     } catch (error) {
-      const status = error.statusCode;
-      this.handleError(status);
+      await this.handleError(error);
     }
   }
 
-  private getAuthorizationCredentials(header: string) {
+  private async getAuthorizationCredentials(header: string) {
     const base64Credentials = header.split(' ')[1];
     const credentials = Buffer.from(base64Credentials, 'base64').toString(
       'ascii',
@@ -53,11 +51,11 @@ export class AuthMiddleware implements NestMiddleware {
     return credentials.split(':');
   }
 
-  private handleError(status: number) {
+  private async handleError(error: any) {
+    const status = error.statusCode;
+
     if (status === 401) {
       throw new UnauthorizedException();
-    } else if (status === 400) {
-      throw new BadRequestException();
     } else {
       throw new IdentityAccessError(
         'Error on authenticate, something went wrong.',

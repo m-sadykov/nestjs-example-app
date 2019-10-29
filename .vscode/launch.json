@@ -22,6 +22,41 @@
       "request": "launch",
       "name": "NestJS Test",
       "program": "${workspaceFolder}/dist/src/main.js"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Jest File",
+      "program": "${workspaceFolder}/node_modules/jest/bin/jest",
+      "args": [
+        "--runInBand",
+        "${fileBasenameNoExtension}",
+        "--config=${workspaceFolder}/package.json",
+        "--coverage=false"
+      ],
+      "console": "internalConsole",
+      "internalConsoleOptions": "neverOpen",
+      "disableOptimisticBPs": true,
+      "windows": {
+        "program": "${workspaceFolder}/node_modules/jest/bin/jest"
+      }
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Jest File (coverage)",
+      "program": "${workspaceFolder}/node_modules/jest/bin/jest",
+      "args": [
+        "--runInBand",
+        "${fileBasenameNoExtension}",
+        "--config=${workspaceFolder}/package.json"
+      ],
+      "console": "internalConsole",
+      "internalConsoleOptions": "neverOpen",
+      "disableOptimisticBPs": true,
+      "windows": {
+        "program": "${workspaceFolder}/node_modules/jest/bin/jest"
+      }
     }
   ]
 }
