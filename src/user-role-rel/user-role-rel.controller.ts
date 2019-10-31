@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { ApiUseTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { UserRoleRel } from './interface/user-role-rel.interface';
-import { MongodDbService } from '../mongo-db.service';
+import { MongoDbService } from '../mongo-db.service';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateRelDto } from './dto/create-rel.dto';
@@ -23,7 +23,7 @@ export class UserRoleRelController {
   constructor(
     @InjectModel('UserRoleRel')
     private readonly relationModel: Model<UserRoleRel>,
-    private readonly dbService: MongodDbService,
+    private readonly dbService: MongoDbService,
     private readonly relationService: UserRoleRelService,
   ) {}
 

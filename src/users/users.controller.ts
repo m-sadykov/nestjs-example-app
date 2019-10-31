@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ApiUseTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
-import { MongodDbService } from '../mongo-db.service';
+import { MongoDbService } from '../mongo-db.service';
 import { Model } from 'mongoose';
 import { User } from './interface/user';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -25,7 +25,7 @@ export class UsersController {
   constructor(
     @InjectModel('User')
     private readonly userModel: Model<User>,
-    private readonly dbService: MongodDbService,
+    private readonly dbService: MongoDbService,
     private readonly usersService: UsersService,
   ) {}
 

@@ -13,7 +13,7 @@ import { UpdateRoleDto } from './dto/update-role.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Role } from './interface/roles.interface';
-import { MongodDbService } from '../mongo-db.service';
+import { MongoDbService } from '../mongo-db.service';
 import { ApiUseTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { Roles } from '../auth/roles.decorator';
 import { RolesService } from './roles.service';
@@ -24,7 +24,7 @@ import { RolesService } from './roles.service';
 export class RolesController {
   constructor(
     @InjectModel('Role') private readonly roleModel: Model<Role>,
-    private readonly dbService: MongodDbService,
+    private readonly dbService: MongoDbService,
     private readonly rolesSerivce: RolesService,
   ) {}
 

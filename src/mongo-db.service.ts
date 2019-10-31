@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
-export class MongodDbService {
+export class MongoDbService {
   async create(model, body): Promise<any> {
-    const creattionResult = new model(body);
-    return creattionResult.save();
+    const creationResult = new model(body);
+    return creationResult.save();
   }
 
   async getAll(model): Promise<any[]> {
@@ -21,7 +21,7 @@ export class MongodDbService {
     });
   }
 
-  async delete(model, id): Promise<void> {
+  async delete(model, id): Promise<any> {
     return model.findByIdAndUpdate(id, { isDeleted: true });
   }
 }

@@ -3,7 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AccountSchema } from './schema/account.schema';
 import { AccountsController } from './accounts.controller';
 import { AccountsService } from './accounts.service';
-import { MongodDbService } from '../mongo-db.service';
+import { MongoDbService } from '../mongo-db.service';
 import { AuthMiddleware } from '../auth/auth.middleware';
 import { UsersModule } from '../users/users.module';
 
@@ -13,7 +13,7 @@ import { UsersModule } from '../users/users.module';
     UsersModule,
   ],
   controllers: [AccountsController],
-  providers: [AccountsService, MongodDbService],
+  providers: [AccountsService, MongoDbService],
 })
 export class AccountsModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

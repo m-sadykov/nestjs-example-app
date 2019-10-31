@@ -2,7 +2,7 @@ import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { UserRoleRelController } from './user-role-rel.controller';
 import { UserRoleRelService } from './user-role-rel.service';
 import { MongooseModule } from '@nestjs/mongoose';
-import { MongodDbService } from '../mongo-db.service';
+import { MongoDbService } from '../mongo-db.service';
 import { UserRoleRel } from './schema/user-role-rel.schema';
 import { AuthMiddleware } from '../auth/auth.middleware';
 import { UsersModule } from '../users/users.module';
@@ -13,7 +13,7 @@ import { UsersModule } from '../users/users.module';
     UsersModule,
   ],
   controllers: [UserRoleRelController],
-  providers: [UserRoleRelService, MongodDbService],
+  providers: [UserRoleRelService, MongoDbService],
 })
 export class UserRoleRelModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

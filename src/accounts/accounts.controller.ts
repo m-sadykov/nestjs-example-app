@@ -11,10 +11,11 @@ import { InjectModel } from '@nestjs/mongoose';
 import { UpdateAccountDto } from './dto/update-account.dto';
 import { CreateAccountDto } from './dto/create-account.dto';
 import { ApiUseTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
-import { MongodDbService } from '../mongo-db.service';
+import { MongoDbService } from '../mongo-db.service';
 import { Model } from 'mongoose';
 import { Account } from './interface/account';
 import { Roles } from '../auth/roles.decorator';
+import { Response } from 'express';
 
 @ApiBearerAuth()
 @ApiUseTags('accounts')
@@ -22,7 +23,7 @@ import { Roles } from '../auth/roles.decorator';
 export class AccountsController {
   constructor(
     @InjectModel('Account') private readonly accountModel: Model<Account>,
-    private readonly dbService: MongodDbService,
+    private readonly dbService: MongoDbService,
   ) {}
 
   @Get()
@@ -72,7 +73,7 @@ export class AccountsController {
     status: 200,
     description: 'Account has been successfully removed.',
   })
-  async removeAccount(@Param('id') id: string): Promise<void> {
+  async removeAccount(@Param('id') id: string): Promise<Response> {
     return this.dbService.delete(this.accountModel, id);
   }
 }
