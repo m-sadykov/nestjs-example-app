@@ -17,6 +17,7 @@ import { MongoDbService } from '../mongo-db.service';
 import { ApiUseTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { Roles } from '../auth/roles.decorator';
 import { RolesService } from './roles.service';
+import { Response } from 'express';
 
 @ApiBearerAuth()
 @ApiUseTags('roles')
@@ -81,7 +82,7 @@ export class RolesController {
     status: 200,
     description: 'Role has bee successfully removed',
   })
-  async removeRole(@Param(':id') id: string): Promise<void> {
+  async removeRole(@Param(':id') id: string): Promise<Response> {
     return this.dbService.delete(this.roleModel, id);
   }
 }

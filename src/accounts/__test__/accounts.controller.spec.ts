@@ -1,9 +1,7 @@
 import 'reflect-metadata';
 import { Test } from '@nestjs/testing';
 import { getModelToken } from '@nestjs/mongoose';
-
 import { AccountsController } from '../accounts.controller';
-import { AccountsService } from '../accounts.service';
 import { MongoDbService } from '../../mongo-db.service';
 import { AccountSchema } from '../schema/account.schema';
 
@@ -15,7 +13,6 @@ describe('Accounts Controller', () => {
     const module = await Test.createTestingModule({
       controllers: [AccountsController],
       providers: [
-        AccountsService,
         MongoDbService,
         {
           provide: getModelToken('Account'),
@@ -34,10 +31,12 @@ describe('Accounts Controller', () => {
 
       jest
         .spyOn(mongoDbService, 'getAll')
-        .mockImplementationOnce((): any => mockAccount);
+        .mockImplementationOnce(
+          (): any => [mockAccount, mockAccount, mockAccount],
+        );
 
-      const account = await accountsController.getAll();
-      expect(account).toBe(mockAccount);
+      const accounts = await accountsController.getAll();
+      expect(Array.isArray(accounts)).toBe(true);
     });
   });
 

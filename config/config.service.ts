@@ -20,7 +20,6 @@ export class ConfigService {
         .valid('dev', 'prod', 'test')
         .default('dev'),
       MONGO_URL: Joi.string(),
-      MONGO_DB_NAME: Joi.string(),
     });
 
     const { error, value: validatedEnvConfig } = envVarSchema.validate(
