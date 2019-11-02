@@ -18,7 +18,7 @@ import {
   UpdateUserDto,
   UserPresentationDto,
 } from './dto/user.dto';
-import { Roles } from '../roles/roles.decorator';
+import { Roles } from '../auth/auth.roles.decorator';
 import { UsersService } from './users.service';
 import { USER_MODEL } from './constants/constants';
 

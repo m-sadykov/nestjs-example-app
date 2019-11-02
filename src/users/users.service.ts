@@ -1,4 +1,9 @@
-import { Injectable, Inject, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  UnauthorizedException,
+  OnModuleInit,
+} from '@nestjs/common';
 import { Model } from 'mongoose';
 import { User, AuthenticatedUser } from './interface/user';
 import { UserRoleRel } from '../user-role-rel/interface/user-role-rel';
@@ -6,9 +11,11 @@ import { Role } from '../roles/interface/role';
 import { USER_MODEL } from './constants/constants';
 import { USER_ROLE_RELATION_MODEL } from '../user-role-rel/constants/constants';
 import { ROLE_MODEL } from '../roles/constants/constants';
+import { CreateUserDto } from './dto/user.dto';
+import { CreateRoleDto } from '../roles/dto/role.dto';
 
 @Injectable()
-export class UsersService {
+export class UsersService implements OnModuleInit {
   constructor(
     @Inject(USER_MODEL)
     private readonly userModel: Model<User>,
@@ -17,6 +24,20 @@ export class UsersService {
     @Inject(ROLE_MODEL)
     private readonly roleModel: Model<Role>,
   ) {}
+
+  async onModuleInit() {
+    const isUserExists = await this.isUserAlreadyExists('admin');
+
+    if (!isUserExists) {
+      const user: CreateUserDto = {
+        username: 'admin',
+        password: '123',
+      };
+
+      await this.createAdminUser(user);
+      console.info(`Admin user created with password ${user.password}`);
+    }
+  }
 
   async validate(
     username: string,
@@ -49,5 +70,24 @@ export class UsersService {
     }
 
     return false;
+  }
+
+  private async createAdminUser(user: CreateUserDto) {
+    const role: CreateRoleDto = {
+      name: 'admin',
+      displayName: 'ADMIN',
+      description: 'admin role with access to all API routes',
+    };
+
+    const createdUser = await this.userModel.create(user);
+
+    const createdRole = await this.roleModel.create(role);
+
+    const relation = {
+      userId: createdUser._id,
+      roleId: createdRole._id,
+    };
+
+    return this.userRoleRel.create(relation);
   }
 }

@@ -16,7 +16,7 @@ import {
   CreateRelDto,
   UserRoleRelPresentationDto,
 } from './dto/user-role-rel.dto';
-import { Roles } from '../roles/roles.decorator';
+import { Roles } from '../auth/auth.roles.decorator';
 import { UserRoleRelService } from './user-role-rel.service';
 import { USER_ROLE_RELATION_MODEL } from './constants/constants';
 

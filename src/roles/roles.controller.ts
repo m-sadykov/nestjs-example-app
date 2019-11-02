@@ -17,7 +17,7 @@ import {
 import { Model } from 'mongoose';
 import { DatabaseService } from '../database/database.service';
 import { ApiUseTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
-import { Roles } from './roles.decorator';
+import { Roles } from '../auth/auth.roles.decorator';
 import { RolesService } from './roles.service';
 import { Response } from 'express';
 import { Role } from './interface/role';

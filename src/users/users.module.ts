@@ -5,10 +5,8 @@ import { DatabaseService } from '../database/database.service';
 import { AuthMiddleware } from '../auth/auth.middleware';
 import { DatabaseModule } from '../database/database.module';
 import { usersProviders } from './users.providers';
-import { USER_ROLE_RELATION_MODEL } from '../user-role-rel/constants/constants';
-import { UserRoleRelSchema } from '../user-role-rel/schema/user-role-rel.schema';
-import { ROLE_MODEL } from '../roles/constants/constants';
-import { RoleSchema } from '../roles/schema/role.schema';
+import { rolesProviders } from '../roles/roles.providers';
+import { userRoleRelProviders } from '../user-role-rel/user-role-rel.providers';
 
 @Module({
   imports: [DatabaseModule],
@@ -17,14 +15,8 @@ import { RoleSchema } from '../roles/schema/role.schema';
     UsersService,
     DatabaseService,
     ...usersProviders,
-    {
-      provide: USER_ROLE_RELATION_MODEL,
-      useValue: UserRoleRelSchema,
-    },
-    {
-      provide: ROLE_MODEL,
-      useValue: RoleSchema,
-    },
+    ...rolesProviders,
+    ...userRoleRelProviders,
   ],
   exports: [UsersService],
 })

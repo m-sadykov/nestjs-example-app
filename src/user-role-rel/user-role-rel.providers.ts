@@ -10,7 +10,7 @@ export const userRoleRelProviders = [
       connection.model(
         'UserRoleRel',
         UserRoleRelSchema,
-        'identity-user-role-rel',
+        'identity-user-role-rels',
       ),
     inject: [DATABASE_CONNECTION],
   },
