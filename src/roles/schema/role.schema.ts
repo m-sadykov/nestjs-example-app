@@ -1,11 +1,8 @@
-import * as mongoose from 'mongoose';
+import { Schema } from 'mongoose';
 
-export const RoleSchema = new mongoose.Schema({
-  name: String,
-  displayName: String,
-  description: String,
-  isDeleted: {
-    type: Boolean,
-    default: false,
-  },
+export const RoleSchema: Schema = new Schema({
+  name: { type: String, required: true, unique: true },
+  displayName: { type: String, required: true },
+  description: { type: String, required: true },
+  isDeleted: { type: Boolean, default: false },
 });

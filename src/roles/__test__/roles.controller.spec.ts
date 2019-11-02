@@ -1,24 +1,24 @@
 import 'reflect-metadata';
 import { Test } from '@nestjs/testing';
-import { getModelToken } from '@nestjs/mongoose';
 import { RolesController } from '../roles.controller';
-import { MongoDbService } from '../../mongo-db.service';
+import { DatabaseService } from '../../database/database.service';
 import { RoleSchema } from '../schema/role.schema';
 import { RolesService } from '../roles.service';
+import { ROLE_MODEL } from '../constants/constants';
 
 describe('Roles Controller', () => {
   let rolesController: RolesController;
   let rolesService: RolesService;
-  let mongoDbService: MongoDbService;
+  let databaseService: DatabaseService;
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
       controllers: [RolesController],
       providers: [
-        MongoDbService,
+        DatabaseService,
         RolesService,
         {
-          provide: getModelToken('Role'),
+          provide: ROLE_MODEL,
           useValue: RoleSchema,
         },
       ],
@@ -26,7 +26,7 @@ describe('Roles Controller', () => {
 
     rolesController = module.get<RolesController>(RolesController);
     rolesService = module.get<RolesService>(RolesService);
-    mongoDbService = module.get<MongoDbService>(MongoDbService);
+    databaseService = module.get<DatabaseService>(DatabaseService);
   });
 
   describe('getAll', () => {
@@ -34,7 +34,7 @@ describe('Roles Controller', () => {
       const mockRole = getMockRole();
 
       jest
-        .spyOn(mongoDbService, 'getAll')
+        .spyOn(databaseService, 'getAll')
         .mockImplementationOnce((): any => [mockRole, mockRole, mockRole]);
 
       const roles = await rolesController.getAll();
@@ -48,7 +48,7 @@ describe('Roles Controller', () => {
       const mockRole = getMockRole();
 
       jest
-        .spyOn(mongoDbService, 'findOne')
+        .spyOn(databaseService, 'findOne')
         .mockImplementationOnce((): any => mockRole);
 
       const role = await rolesController.findOne(id);
@@ -65,12 +65,11 @@ describe('Roles Controller', () => {
         .mockImplementationOnce((): Promise<boolean> => Promise.resolve(false));
 
       jest
-        .spyOn(mongoDbService, 'create')
+        .spyOn(databaseService, 'create')
         .mockImplementationOnce((): any => mockRole);
 
       const createdRole = await rolesController.createRole(mockRole);
       expect(createdRole).toBe(mockRole);
-      // isRoleExists.mockReset();
     });
 
     it('should throw BadRequest exception if role is already exists', async () => {
@@ -80,7 +79,7 @@ describe('Roles Controller', () => {
         .spyOn(rolesService, 'isRoleAlreadyExists')
         .mockImplementationOnce((): Promise<boolean> => Promise.resolve(true));
 
-      jest.spyOn(mongoDbService, 'create').mockImplementationOnce(
+      jest.spyOn(databaseService, 'create').mockImplementationOnce(
         (): any => {
           return {
             statusCode: 400,
@@ -107,7 +106,7 @@ describe('Roles Controller', () => {
       const mockRole = getMockRole();
 
       jest
-        .spyOn(mongoDbService, 'update')
+        .spyOn(databaseService, 'update')
         .mockImplementationOnce((): any => mockRole);
 
       const updatedRole = await rolesController.updateRole(id, mockRole);
@@ -119,7 +118,7 @@ describe('Roles Controller', () => {
     it('should remove role by id', async () => {
       const id = 'some_id';
 
-      jest.spyOn(mongoDbService, 'delete').mockImplementationOnce(
+      jest.spyOn(databaseService, 'delete').mockImplementationOnce(
         (): any => {
           return {
             statusCode: 200,

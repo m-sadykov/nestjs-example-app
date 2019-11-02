@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
-export class MongoDbService {
+export class DatabaseService {
   async create(model, body): Promise<any> {
     const creationResult = new model(body);
     return creationResult.save();

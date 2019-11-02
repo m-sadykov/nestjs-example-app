@@ -1,19 +1,16 @@
 import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { UserRoleRelController } from './user-role-rel.controller';
 import { UserRoleRelService } from './user-role-rel.service';
-import { MongooseModule } from '@nestjs/mongoose';
-import { MongoDbService } from '../mongo-db.service';
-import { UserRoleRel } from './schema/user-role-rel.schema';
+import { DatabaseService } from '../database/database.service';
 import { AuthMiddleware } from '../auth/auth.middleware';
 import { UsersModule } from '../users/users.module';
+import { DatabaseModule } from '../database/database.module';
+import { userRoleRelProviders } from './user-role-rel.providers';
 
 @Module({
-  imports: [
-    MongooseModule.forFeature([{ name: 'UserRoleRel', schema: UserRoleRel }]),
-    UsersModule,
-  ],
+  imports: [DatabaseModule, UsersModule],
   controllers: [UserRoleRelController],
-  providers: [UserRoleRelService, MongoDbService],
+  providers: [UserRoleRelService, DatabaseService, ...userRoleRelProviders],
 })
 export class UserRoleRelModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

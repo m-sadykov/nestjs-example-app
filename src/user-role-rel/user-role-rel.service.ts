@@ -1,16 +1,17 @@
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
+import { Injectable, Inject } from '@nestjs/common';
 import { Model } from 'mongoose';
-import { UserRoleRel } from './interface/user-role-rel.interface';
+import { UserRoleRel } from './interface/user-role-rel';
+import { USER_ROLE_RELATION_MODEL } from './constants/constants';
+import { CreateRelDto } from './dto/user-role-rel.dto';
 
 @Injectable()
 export class UserRoleRelService {
   constructor(
-    @InjectModel('UserRoleRel')
+    @Inject(USER_ROLE_RELATION_MODEL)
     private readonly relationModel: Model<UserRoleRel>,
   ) {}
 
-  async isUserRoleRelAlreadyExists(createRel: UserRoleRel): Promise<boolean> {
+  async isUserRoleRelAlreadyExists(createRel: CreateRelDto): Promise<boolean> {
     const query = createRel;
 
     const [relation] = await this.relationModel.find(query);

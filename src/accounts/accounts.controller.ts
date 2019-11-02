@@ -6,36 +6,40 @@ import {
   Body,
   Post,
   Delete,
+  Inject,
 } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { UpdateAccountDto } from './dto/update-account.dto';
-import { CreateAccountDto } from './dto/create-account.dto';
+import {
+  CreateAccountDto,
+  UpdateAccountDto,
+  AccountPresentationDto,
+} from './dto/account.dto';
 import { ApiUseTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
-import { MongoDbService } from '../mongo-db.service';
+import { DatabaseService } from '../database/database.service';
 import { Model } from 'mongoose';
 import { Account } from './interface/account';
-import { Roles } from '../auth/roles.decorator';
+import { Roles } from '../roles/roles.decorator';
 import { Response } from 'express';
+import { ACCOUNT_MODEL } from './constants/constants';
 
 @ApiBearerAuth()
 @ApiUseTags('accounts')
 @Controller('accounts')
 export class AccountsController {
   constructor(
-    @InjectModel('Account') private readonly accountModel: Model<Account>,
-    private readonly dbService: MongoDbService,
+    @Inject(ACCOUNT_MODEL) private readonly accountModel: Model<Account>,
+    private readonly dbService: DatabaseService,
   ) {}
 
   @Get()
   @Roles(['admin', 'writer', 'reader'])
-  @ApiResponse({ status: 200, type: [Account] })
+  @ApiResponse({ status: 200, type: [AccountPresentationDto] })
   async getAll(): Promise<Account[]> {
     return this.dbService.getAll(this.accountModel);
   }
 
   @Get(':id')
   @Roles(['admin', 'writer', 'reader'])
-  @ApiResponse({ status: 200, type: Account })
+  @ApiResponse({ status: 200, type: AccountPresentationDto })
   async findOne(@Param('id') id: string): Promise<Account> {
     return this.dbService.findOne(this.accountModel, id);
   }
@@ -45,7 +49,7 @@ export class AccountsController {
   @ApiResponse({
     status: 201,
     description: 'Account has been successfully created.',
-    type: Account,
+    type: AccountPresentationDto,
   })
   async createAccount(
     @Body() createAccountDto: CreateAccountDto,
@@ -58,7 +62,7 @@ export class AccountsController {
   @ApiResponse({
     status: 200,
     description: 'Account has been successfully updated.',
-    type: Account,
+    type: AccountPresentationDto,
   })
   async updateAccount(
     @Param('id') id: string,

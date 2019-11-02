@@ -1,28 +1,28 @@
 import 'reflect-metadata';
 import { Test } from '@nestjs/testing';
-import { getModelToken } from '@nestjs/mongoose';
 import { AccountsController } from '../accounts.controller';
-import { MongoDbService } from '../../mongo-db.service';
+import { DatabaseService } from '../../database/database.service';
 import { AccountSchema } from '../schema/account.schema';
+import { ACCOUNT_MODEL } from '../constants/constants';
 
 describe('Accounts Controller', () => {
   let accountsController: AccountsController;
-  let mongoDbService: MongoDbService;
+  let databaseService: DatabaseService;
 
   beforeAll(async () => {
     const module = await Test.createTestingModule({
       controllers: [AccountsController],
       providers: [
-        MongoDbService,
+        DatabaseService,
         {
-          provide: getModelToken('Account'),
+          provide: ACCOUNT_MODEL,
           useValue: AccountSchema,
         },
       ],
     }).compile();
 
     accountsController = module.get<AccountsController>(AccountsController);
-    mongoDbService = module.get<MongoDbService>(MongoDbService);
+    databaseService = module.get<DatabaseService>(DatabaseService);
   });
 
   describe('getAll', () => {
@@ -30,7 +30,7 @@ describe('Accounts Controller', () => {
       const mockAccount = getMockAccount();
 
       jest
-        .spyOn(mongoDbService, 'getAll')
+        .spyOn(databaseService, 'getAll')
         .mockImplementationOnce(
           (): any => [mockAccount, mockAccount, mockAccount],
         );
@@ -46,7 +46,7 @@ describe('Accounts Controller', () => {
       const mockAccount = getMockAccount();
 
       jest
-        .spyOn(mongoDbService, 'findOne')
+        .spyOn(databaseService, 'findOne')
         .mockImplementationOnce((): any => mockAccount);
 
       const account = await accountsController.findOne(id);
@@ -59,7 +59,7 @@ describe('Accounts Controller', () => {
       const mockAccount = getMockAccount();
 
       jest
-        .spyOn(mongoDbService, 'create')
+        .spyOn(databaseService, 'create')
         .mockImplementationOnce((): any => mockAccount);
 
       const createdAccount = await accountsController.createAccount(
@@ -75,7 +75,7 @@ describe('Accounts Controller', () => {
       const mockAccount = getMockAccount();
 
       jest
-        .spyOn(mongoDbService, 'update')
+        .spyOn(databaseService, 'update')
         .mockImplementationOnce((): any => mockAccount);
 
       const updatedAccount = await accountsController.updateAccount(
@@ -90,7 +90,7 @@ describe('Accounts Controller', () => {
     it('should remove account by id', async () => {
       const id = 'random_id';
 
-      jest.spyOn(mongoDbService, 'delete').mockImplementationOnce(
+      jest.spyOn(databaseService, 'delete').mockImplementationOnce(
         (): any => {
           return {
             statusCode: 200,

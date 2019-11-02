@@ -1,17 +1,7 @@
-import * as mongoose from 'mongoose';
+import { Schema } from 'mongoose';
 
-export const UserRoleRel = new mongoose.Schema(
-  {
-    userId: String,
-    roleId: String,
-    isDeleted: {
-      type: Boolean,
-      default: false,
-    },
-  },
-  {
-    timestamps: {
-      createdAt: 'created_at',
-    },
-  },
-);
+export const UserRoleRelSchema: Schema = new Schema({
+  userId: { type: String, required: true },
+  roleId: { type: String, required: true },
+  isDeleted: { type: Boolean, default: false },
+});

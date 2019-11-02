@@ -1,4 +1,5 @@
 import {
+  Inject,
   Controller,
   Get,
   Post,
@@ -8,37 +9,40 @@ import {
   Delete,
   BadRequestException,
 } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
 import { ApiUseTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
-import { MongoDbService } from '../mongo-db.service';
+import { DatabaseService } from '../database/database.service';
 import { Model } from 'mongoose';
 import { User } from './interface/user';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { Roles } from '../auth/roles.decorator';
+import {
+  CreateUserDto,
+  UpdateUserDto,
+  UserPresentationDto,
+} from './dto/user.dto';
+import { Roles } from '../roles/roles.decorator';
 import { UsersService } from './users.service';
+import { USER_MODEL } from './constants/constants';
 
 @ApiBearerAuth()
 @ApiUseTags('users')
 @Controller('users')
 export class UsersController {
   constructor(
-    @InjectModel('User')
+    @Inject(USER_MODEL)
     private readonly userModel: Model<User>,
-    private readonly dbService: MongoDbService,
+    private readonly dbService: DatabaseService,
     private readonly usersService: UsersService,
   ) {}
 
   @Get()
   @Roles(['admin', 'writer'])
-  @ApiResponse({ status: 200, type: [User] })
+  @ApiResponse({ status: 200, type: [UserPresentationDto] })
   async getAll(): Promise<User[]> {
     return this.dbService.getAll(this.userModel);
   }
 
   @Get(':id')
   @Roles(['admin', 'writer'])
-  @ApiResponse({ status: 200, type: User })
+  @ApiResponse({ status: 200, type: UserPresentationDto })
   async findOne(@Param('id') id: string): Promise<User> {
     return this.dbService.findOne(this.userModel, id);
   }
@@ -47,7 +51,7 @@ export class UsersController {
   @Roles(['admin'])
   @ApiResponse({
     status: 201,
-    type: User,
+    type: UserPresentationDto,
     description: 'User has been successfully created.',
   })
   async createUser(@Body() createUserDto: CreateUserDto): Promise<User> {
@@ -65,7 +69,7 @@ export class UsersController {
   @Roles(['admin'])
   @ApiResponse({
     status: 200,
-    type: User,
+    type: UserPresentationDto,
     description: 'User has been successfully updated.',
   })
   async updateUser(

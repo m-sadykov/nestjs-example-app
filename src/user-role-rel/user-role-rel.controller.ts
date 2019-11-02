@@ -1,4 +1,5 @@
 import {
+  Inject,
   Controller,
   Get,
   Param,
@@ -8,35 +9,38 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { ApiUseTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
-import { UserRoleRel } from './interface/user-role-rel.interface';
-import { MongoDbService } from '../mongo-db.service';
-import { InjectModel } from '@nestjs/mongoose';
+import { UserRoleRel } from './interface/user-role-rel';
+import { DatabaseService } from '../database/database.service';
 import { Model } from 'mongoose';
-import { CreateRelDto } from './dto/create-rel.dto';
-import { Roles } from '../auth/roles.decorator';
+import {
+  CreateRelDto,
+  UserRoleRelPresentationDto,
+} from './dto/user-role-rel.dto';
+import { Roles } from '../roles/roles.decorator';
 import { UserRoleRelService } from './user-role-rel.service';
+import { USER_ROLE_RELATION_MODEL } from './constants/constants';
 
 @ApiBearerAuth()
 @ApiUseTags('user-role-rel')
 @Controller('user-role-rel')
 export class UserRoleRelController {
   constructor(
-    @InjectModel('UserRoleRel')
+    @Inject(USER_ROLE_RELATION_MODEL)
     private readonly relationModel: Model<UserRoleRel>,
-    private readonly dbService: MongoDbService,
+    private readonly dbService: DatabaseService,
     private readonly relationService: UserRoleRelService,
   ) {}
 
   @Get()
   @Roles(['admin', 'writer'])
-  @ApiResponse({ status: 200, type: [UserRoleRel] })
+  @ApiResponse({ status: 200, type: [UserRoleRelPresentationDto] })
   getAll(): Promise<UserRoleRel[]> {
     return this.dbService.getAll(this.relationModel);
   }
 
   @Get(':accountId')
   @Roles(['admin', 'writer'])
-  @ApiResponse({ status: 200, type: UserRoleRel })
+  @ApiResponse({ status: 200, type: UserRoleRelPresentationDto })
   getUserRoleRelByAccountId(
     @Param('accountId') accountId: string,
   ): Promise<UserRoleRel> {
@@ -47,7 +51,7 @@ export class UserRoleRelController {
   @Roles(['admin'])
   @ApiResponse({
     status: 201,
-    type: UserRoleRel,
+    type: UserRoleRelPresentationDto,
     description: 'User role relation has been successfully created.',
   })
   async createUserRoleRel(

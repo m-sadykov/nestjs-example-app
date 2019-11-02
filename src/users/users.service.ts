@@ -1,18 +1,20 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
+import { Injectable, Inject, UnauthorizedException } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { User, AuthenticatedUser } from './interface/user';
-import { UserRoleRel } from '../user-role-rel/interface/user-role-rel.interface';
-import { Role } from '../roles/interface/roles.interface';
+import { UserRoleRel } from '../user-role-rel/interface/user-role-rel';
+import { Role } from '../roles/interface/role';
+import { USER_MODEL } from './constants/constants';
+import { USER_ROLE_RELATION_MODEL } from '../user-role-rel/constants/constants';
+import { ROLE_MODEL } from '../roles/constants/constants';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectModel('User')
+    @Inject(USER_MODEL)
     private readonly userModel: Model<User>,
-    @InjectModel('UserRoleRel')
+    @Inject(USER_ROLE_RELATION_MODEL)
     private readonly userRoleRel: Model<UserRoleRel>,
-    @InjectModel('Role')
+    @Inject(ROLE_MODEL)
     private readonly roleModel: Model<Role>,
   ) {}
 

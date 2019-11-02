@@ -1,19 +1,22 @@
 import { IsString, IsNotEmpty } from 'class-validator';
 import { ApiModelProperty } from '@nestjs/swagger';
 
-export class CreateRoleDto {
+export class CreateRelDto {
   @IsString()
   @IsNotEmpty()
   @ApiModelProperty()
-  readonly name: string;
+  readonly userId: string;
 
   @IsString()
   @IsNotEmpty()
   @ApiModelProperty()
-  readonly displayName: string;
+  readonly roleId: string;
+}
 
-  @IsString()
-  @IsNotEmpty()
+export class UserRoleRelPresentationDto {
   @ApiModelProperty()
-  readonly description: string;
+  userId: string;
+
+  @ApiModelProperty()
+  roleId: string;
 }

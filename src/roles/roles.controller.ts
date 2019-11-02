@@ -7,38 +7,42 @@ import {
   Patch,
   Delete,
   BadRequestException,
+  Inject,
 } from '@nestjs/common';
-import { CreateRoleDto } from './dto/create-role.dto';
-import { UpdateRoleDto } from './dto/update-role.dto';
-import { InjectModel } from '@nestjs/mongoose';
+import {
+  CreateRoleDto,
+  UpdateRoleDto,
+  RolePresentationDto,
+} from './dto/role.dto';
 import { Model } from 'mongoose';
-import { Role } from './interface/roles.interface';
-import { MongoDbService } from '../mongo-db.service';
+import { DatabaseService } from '../database/database.service';
 import { ApiUseTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
-import { Roles } from '../auth/roles.decorator';
+import { Roles } from './roles.decorator';
 import { RolesService } from './roles.service';
 import { Response } from 'express';
+import { Role } from './interface/role';
+import { ROLE_MODEL } from './constants/constants';
 
 @ApiBearerAuth()
 @ApiUseTags('roles')
 @Controller('roles')
 export class RolesController {
   constructor(
-    @InjectModel('Role') private readonly roleModel: Model<Role>,
-    private readonly dbService: MongoDbService,
+    @Inject(ROLE_MODEL) private readonly roleModel: Model<Role>,
+    private readonly dbService: DatabaseService,
     private readonly rolesSerivce: RolesService,
   ) {}
 
   @Get()
   @Roles(['admin', 'writer'])
-  @ApiResponse({ status: 200, type: [Role] })
+  @ApiResponse({ status: 200, type: [RolePresentationDto] })
   async getAll(): Promise<Role[]> {
     return this.dbService.getAll(this.roleModel);
   }
 
   @Get(':id')
   @Roles(['admin', 'writer'])
-  @ApiResponse({ status: 200, type: Role })
+  @ApiResponse({ status: 200, type: RolePresentationDto })
   async findOne(@Param('id') id: string): Promise<Role> {
     return this.dbService.findOne(this.roleModel, id);
   }
@@ -47,7 +51,7 @@ export class RolesController {
   @Roles(['admin'])
   @ApiResponse({
     status: 201,
-    type: Role,
+    type: RolePresentationDto,
     description: 'Role has been successfully created.',
   })
   async createRole(@Body() createRoleDto: CreateRoleDto): Promise<Role> {
@@ -66,7 +70,7 @@ export class RolesController {
   @Roles(['admin'])
   @ApiResponse({
     status: 200,
-    type: Role,
+    type: RolePresentationDto,
     description: 'Role has been successfully updated.',
   })
   async updateRole(

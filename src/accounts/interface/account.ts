@@ -1,18 +1,9 @@
-import { ApiModelProperty } from '@nestjs/swagger';
+import { Document } from 'mongoose';
 
-export class Account {
-  @ApiModelProperty()
-  id: string;
-
-  @ApiModelProperty()
-  firstName: string;
-
-  @ApiModelProperty()
-  lastName: string;
-
-  @ApiModelProperty()
-  email: string;
-
-  @ApiModelProperty()
-  age: number;
+export interface Account extends Document {
+  readonly id: string;
+  readonly firstName: string;
+  readonly lastName: string;
+  readonly email: string;
+  readonly age: number;
 }
