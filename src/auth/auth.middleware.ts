@@ -22,7 +22,7 @@ export type AuthenticatedRequest = {
 export class AuthMiddleware implements NestMiddleware {
   constructor(private readonly usersSerice: UsersService) {}
 
-  async use(req: AuthenticatedRequest, next: NextFunction) {
+  async use(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     const authHeaders = req.headers.authorization;
 
     if (!authHeaders) {

@@ -6,6 +6,7 @@ describe('Auth middleware', () => {
     validate: jest.fn(),
   };
   const authMiddleware = new AuthMiddleware(userService as any);
+  const response = {};
   const next = jest.fn();
 
   it('should modify request globally with authenticated user', async () => {
@@ -23,7 +24,7 @@ describe('Auth middleware', () => {
       }),
     );
 
-    await authMiddleware.use(request, next);
+    await authMiddleware.use(request, response as any, next);
 
     expect(request.user).toMatchObject({
       username: 'username',
@@ -43,7 +44,7 @@ describe('Auth middleware', () => {
     });
 
     try {
-      await authMiddleware.use(request, next);
+      await authMiddleware.use(request, response as any, next);
     } catch (error) {
       expect(error.status).toBe(401);
       expect(error.response).toMatchObject({
@@ -68,7 +69,7 @@ describe('Auth middleware', () => {
     });
 
     try {
-      await authMiddleware.use(request, next);
+      await authMiddleware.use(request, response as any, next);
     } catch (error) {
       expect(error.status).toBe(401);
       expect(error.response).toMatchObject({
@@ -93,7 +94,7 @@ describe('Auth middleware', () => {
     });
 
     try {
-      await authMiddleware.use(request, next);
+      await authMiddleware.use(request, response as any, next);
     } catch (error) {
       expect(error.status).toBe(401);
       expect(error.response).toMatchObject({
@@ -113,7 +114,7 @@ describe('Auth middleware', () => {
     userService.validate.mockImplementationOnce(() => new Error());
 
     try {
-      await authMiddleware.use(request, next);
+      await authMiddleware.use(request, response as any, next);
     } catch (error) {
       expect(error.message).toBe(
         'Error on authenticate, something went wrong.',

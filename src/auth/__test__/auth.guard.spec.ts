@@ -11,6 +11,7 @@ describe('Auth Guard', () => {
     validate: jest.fn(),
   };
   const authMiddleware = new AuthMiddleware(userService as any);
+  const response = {};
   const next = jest.fn();
   const context = {
     getHandler: jest.fn(),
@@ -38,7 +39,7 @@ describe('Auth Guard', () => {
 
     userService.validate.mockResolvedValueOnce(Promise.resolve(mockUser));
 
-    await authMiddleware.use(request, next);
+    await authMiddleware.use(request, response as any, next);
   }
 
   it('should return true if user has roles assigned', async () => {

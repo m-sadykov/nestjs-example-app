@@ -13,9 +13,9 @@ export class RolesService {
   async isRoleAlreadyExists(name: string): Promise<boolean> {
     const query = { name };
 
-    const [role] = await this.roleModel.find(query);
+    const role = await this.roleModel.find(query);
 
-    if (role) {
+    if (role.length > 0) {
       return true;
     }
 

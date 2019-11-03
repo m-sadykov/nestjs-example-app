@@ -73,7 +73,7 @@ export class UsersService implements OnModuleInit {
   }
 
   private async createAdminUser(user: CreateUserDto) {
-    const role: CreateRoleDto = {
+    const role = {
       name: 'admin',
       displayName: 'ADMIN',
       description: 'admin role with access to all API routes',
