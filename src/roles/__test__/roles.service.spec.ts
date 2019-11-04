@@ -23,7 +23,7 @@ describe('Roles Service', () => {
     rolesService = module.get<RolesService>(RolesService);
   });
 
-  it('should return false ', async () => {
+  it('isRoleAlreadyExists should return false ', async () => {
     const role = 'some_role';
 
     jest.spyOn(roleModel, 'find').mockImplementationOnce(async () => {
@@ -34,7 +34,7 @@ describe('Roles Service', () => {
     expect(isUserExists).toBe(false);
   });
 
-  it('should return true ', async () => {
+  it('isRoleAlreadyExists should return true ', async () => {
     const role = 'some_role';
 
     jest.spyOn(roleModel, 'find').mockImplementationOnce(async () => {

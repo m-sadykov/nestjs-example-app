@@ -114,7 +114,7 @@ describe('Roles Controller', () => {
     });
   });
 
-  describe('remoRole', () => {
+  describe('removeRole', () => {
     it('should remove role by id', async () => {
       const id = 'some_id';
 

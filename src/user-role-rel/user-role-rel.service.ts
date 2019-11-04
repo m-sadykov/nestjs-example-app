@@ -14,9 +14,9 @@ export class UserRoleRelService {
   async isUserRoleRelAlreadyExists(createRel: CreateRelDto): Promise<boolean> {
     const query = createRel;
 
-    const [relation] = await this.relationModel.find(query);
+    const relation = await this.relationModel.find(query);
 
-    if (relation) {
+    if (relation.length > 0) {
       return true;
     }
 

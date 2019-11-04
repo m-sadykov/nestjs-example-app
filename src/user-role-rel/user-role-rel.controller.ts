@@ -19,6 +19,7 @@ import {
 import { Roles } from '../auth/auth.roles.decorator';
 import { UserRoleRelService } from './user-role-rel.service';
 import { USER_ROLE_RELATION_MODEL } from './constants/constants';
+import { Response } from 'express';
 
 @ApiBearerAuth()
 @ApiUseTags('user-role-rel')
@@ -78,7 +79,7 @@ export class UserRoleRelController {
     status: 200,
     description: 'User role relation has bee successfully removed',
   })
-  async removeRel(@Param('id') id: string): Promise<void> {
+  async removeRel(@Param('id') id: string): Promise<Response> {
     return this.dbService.delete(this.relationModel, id);
   }
 }
