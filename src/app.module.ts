@@ -4,7 +4,6 @@ import { AccountsModule } from './accounts/accounts.module';
 import { RolesModule } from './roles/roles.module';
 import { UsersModule } from './users/users.module';
 import { UserRoleRelModule } from './user-role-rel/user-role-rel.module';
-import { DatabaseModule } from './database/database.module';
 
 @Module({
   imports: [
@@ -13,7 +12,6 @@ import { DatabaseModule } from './database/database.module';
     RolesModule,
     UsersModule,
     UserRoleRelModule,
-    // DatabaseModule,
   ],
   controllers: [],
   providers: [],

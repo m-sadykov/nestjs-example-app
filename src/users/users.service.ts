@@ -12,7 +12,6 @@ import { USER_MODEL } from './constants/constants';
 import { USER_ROLE_RELATION_MODEL } from '../user-role-rel/constants/constants';
 import { ROLE_MODEL } from '../roles/constants/constants';
 import { CreateUserDto } from './dto/user.dto';
-import { CreateRoleDto } from '../roles/dto/role.dto';
 
 @Injectable()
 export class UsersService implements OnModuleInit {
@@ -34,8 +33,10 @@ export class UsersService implements OnModuleInit {
         password: '123',
       };
 
-      await this.createAdminUser(user);
+      const admin = await this.createAdminUser(user);
+
       console.info(`Admin user created with password ${user.password}`);
+      return admin;
     }
   }
 
@@ -88,6 +89,8 @@ export class UsersService implements OnModuleInit {
       roleId: createdRole._id,
     };
 
-    return this.userRoleRel.create(relation);
+    await this.userRoleRel.create(relation);
+
+    return createdUser;
   }
 }

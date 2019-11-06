@@ -20,7 +20,7 @@ export type AuthenticatedRequest = {
 
 @Injectable()
 export class AuthMiddleware implements NestMiddleware {
-  constructor(private readonly usersSerice: UsersService) {}
+  constructor(private readonly usersService: UsersService) {}
 
   async use(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     const authHeaders = req.headers.authorization;
@@ -34,7 +34,7 @@ export class AuthMiddleware implements NestMiddleware {
         authHeaders,
       );
 
-      req.user = await this.usersSerice.validate(username, password);
+      req.user = await this.usersService.validate(username, password);
 
       next();
     } catch (error) {

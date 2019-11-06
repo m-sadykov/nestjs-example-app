@@ -21,6 +21,7 @@ import {
 import { Roles } from '../auth/auth.roles.decorator';
 import { UsersService } from './users.service';
 import { USER_MODEL } from './constants/constants';
+import { Response } from 'express';
 
 @ApiBearerAuth()
 @ApiUseTags('users')
@@ -85,7 +86,7 @@ export class UsersController {
     status: 200,
     description: 'User has bee successfully removed',
   })
-  async removeUser(@Param('id') id: string): Promise<void> {
+  async removeUser(@Param('id') id: string): Promise<Response> {
     return this.dbService.delete(this.userModel, id);
   }
 }

@@ -30,7 +30,7 @@ export class RolesController {
   constructor(
     @Inject(ROLE_MODEL) private readonly roleModel: Model<Role>,
     private readonly dbService: DatabaseService,
-    private readonly rolesSerivce: RolesService,
+    private readonly rolesService: RolesService,
   ) {}
 
   @Get()
@@ -57,7 +57,7 @@ export class RolesController {
   async createRole(@Body() createRoleDto: CreateRoleDto): Promise<Role> {
     const { name } = createRoleDto;
 
-    const isRoleExists = await this.rolesSerivce.isRoleAlreadyExists(name);
+    const isRoleExists = await this.rolesService.isRoleAlreadyExists(name);
 
     if (isRoleExists) {
       throw new BadRequestException(`Role name ${name} already exists.`);

@@ -2,7 +2,7 @@ import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { LogginInterceptor } from './logging.insterceptor';
+import { LoggingInterceptor } from './logging.interceptor';
 import { Logger, createLogger, transports, format } from 'winston';
 import { AuthGuard } from './auth/auth.guard';
 
@@ -20,12 +20,12 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalGuards(new AuthGuard(reflector));
-  app.useGlobalInterceptors(new LogginInterceptor(logger));
+  app.useGlobalInterceptors(new LoggingInterceptor(logger));
 
   const options = new DocumentBuilder()
     .setTitle('Nest.js example app')
     .setDescription(
-      'User auto generated admin user credentials to authenticte into swagger',
+      'User auto generated admin user credentials to authenticate into swagger',
     )
     .setVersion('1.0')
     .addBearerAuth('Authorization', 'header', 'basic')
