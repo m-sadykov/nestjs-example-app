@@ -1,18 +1,18 @@
 ## Description
 
-Accounts managing service built with [Nest](https://github.com/nestjs/nest) framework.
+An example app built with [Nest](https://github.com/nestjs/nest) framework.
 
 ## Installation
 
 ```bash
 $ npm install
 ```
+
 ## Build
 
 ```bash
 $ npm run build
 ```
-
 
 ## Running the app
 
@@ -30,13 +30,10 @@ $ npm run start:dev
 # unit tests
 $ npm run test
 
-# e2e tests
-$ npm run test:e2e
-
 # test coverage
 $ npm run test:cov
 ```
 
 ## License
 
-  Nest is [MIT licensed](LICENSE).
+Nest is [MIT licensed](LICENSE).
