@@ -6,45 +6,35 @@ import {
   Body,
   Patch,
   Delete,
-  BadRequestException,
-  Inject,
 } from '@nestjs/common';
 import {
   CreateRoleDto,
   UpdateRoleDto,
   RolePresentationDto,
 } from './dto/role.dto';
-import { Model } from 'mongoose';
-import { DatabaseService } from '../database/database.service';
 import { ApiUseTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { Roles } from '../auth/auth.roles.decorator';
 import { RolesService } from './roles.service';
-import { Response } from 'express';
-import { Role } from './interface/role';
-import { ROLE_MODEL } from './constants/constants';
+import { Role } from './models/role.model';
 
 @ApiBearerAuth()
 @ApiUseTags('roles')
 @Controller('roles')
 export class RolesController {
-  constructor(
-    @Inject(ROLE_MODEL) private readonly roleModel: Model<Role>,
-    private readonly dbService: DatabaseService,
-    private readonly rolesService: RolesService,
-  ) {}
+  constructor(private readonly rolesService: RolesService) {}
 
   @Get()
   @Roles(['admin', 'writer'])
   @ApiResponse({ status: 200, type: [RolePresentationDto] })
   async getAll(): Promise<Role[]> {
-    return this.dbService.getAll(this.roleModel);
+    return this.rolesService.getAll();
   }
 
   @Get(':id')
   @Roles(['admin', 'writer'])
   @ApiResponse({ status: 200, type: RolePresentationDto })
   async findOne(@Param('id') id: string): Promise<Role> {
-    return this.dbService.findOne(this.roleModel, id);
+    return this.rolesService.findOne(id);
   }
 
   @Post()
@@ -55,15 +45,7 @@ export class RolesController {
     description: 'Role has been successfully created.',
   })
   async createRole(@Body() createRoleDto: CreateRoleDto): Promise<Role> {
-    const { name } = createRoleDto;
-
-    const isRoleExists = await this.rolesService.isRoleAlreadyExists(name);
-
-    if (isRoleExists) {
-      throw new BadRequestException(`Role name ${name} already exists.`);
-    }
-
-    return this.dbService.create(this.roleModel, createRoleDto);
+    return this.rolesService.create(createRoleDto);
   }
 
   @Patch(':id')
@@ -77,7 +59,7 @@ export class RolesController {
     @Param('id') id: string,
     @Body() updateRoleDto: UpdateRoleDto,
   ): Promise<Role> {
-    return this.dbService.update(this.roleModel, id, updateRoleDto);
+    return this.rolesService.update(id, updateRoleDto);
   }
 
   @Delete(':id')
@@ -86,7 +68,7 @@ export class RolesController {
     status: 200,
     description: 'Role has bee successfully removed',
   })
-  async removeRole(@Param(':id') id: string): Promise<Response> {
-    return this.dbService.delete(this.roleModel, id);
+  async removeRole(@Param(':id') id: string): Promise<void> {
+    return this.rolesService.delete(id);
   }
 }

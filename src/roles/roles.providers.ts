@@ -1,7 +1,6 @@
-import { ROLE_MODEL } from './constants/constants';
+import { ROLE_MODEL, DATABASE_CONNECTION } from '../constants';
 import { Connection } from 'mongoose';
 import { RoleSchema } from './schema/role.schema';
-import { DATABASE_CONNECTION } from '../database/constants';
 
 export const rolesProviders = [
   {

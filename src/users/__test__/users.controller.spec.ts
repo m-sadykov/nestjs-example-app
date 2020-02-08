@@ -3,11 +3,13 @@ import { UsersController } from '../users.controller';
 import { UsersService } from '../users.service';
 import { DatabaseService } from '../../database/database.service';
 import { Test } from '@nestjs/testing';
-import { USER_MODEL } from '../constants/constants';
+import {
+  USER_MODEL,
+  ROLE_MODEL,
+  USER_ROLE_RELATION_MODEL,
+} from '../../constants';
 import { UserSchema } from '../schema/user.schema';
-import { ROLE_MODEL } from '../../roles/constants/constants';
 import { RoleSchema } from '../../roles/schema/role.schema';
-import { USER_ROLE_RELATION_MODEL } from '../../user-role-rel/constants/constants';
 import { UserRoleRelSchema } from '../../user-role-rel/schema/user-role-rel.schema';
 
 describe('Users Controller', () => {

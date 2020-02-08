@@ -20,7 +20,7 @@ import {
 } from './dto/user.dto';
 import { Roles } from '../auth/auth.roles.decorator';
 import { UsersService } from './users.service';
-import { USER_MODEL } from './constants/constants';
+import { USER_MODEL } from '../constants';
 import { Response } from 'express';
 
 @ApiBearerAuth()

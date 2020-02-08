@@ -1,7 +1,6 @@
-import { USER_ROLE_RELATION_MODEL } from './constants/constants';
+import { USER_ROLE_RELATION_MODEL, DATABASE_CONNECTION } from '../constants';
 import { Connection } from 'mongoose';
 import { UserRoleRelSchema } from './schema/user-role-rel.schema';
-import { DATABASE_CONNECTION } from '../database/constants';
 
 export const userRoleRelProviders = [
   {

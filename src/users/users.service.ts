@@ -7,10 +7,8 @@ import {
 import { Model } from 'mongoose';
 import { User, AuthenticatedUser } from './interface/user';
 import { UserRoleRel } from '../user-role-rel/interface/user-role-rel';
-import { Role } from '../roles/interface/role';
-import { USER_MODEL } from './constants/constants';
-import { USER_ROLE_RELATION_MODEL } from '../user-role-rel/constants/constants';
-import { ROLE_MODEL } from '../roles/constants/constants';
+import { RoleDocument } from '../roles/models/role.model';
+import { USER_MODEL, USER_ROLE_RELATION_MODEL, ROLE_MODEL } from '../constants';
 import { CreateUserDto } from './dto/user.dto';
 
 @Injectable()
@@ -21,7 +19,7 @@ export class UsersService implements OnModuleInit {
     @Inject(USER_ROLE_RELATION_MODEL)
     private readonly userRoleRel: Model<UserRoleRel>,
     @Inject(ROLE_MODEL)
-    private readonly roleModel: Model<Role>,
+    private readonly roleModel: Model<RoleDocument>,
   ) {}
 
   async onModuleInit() {

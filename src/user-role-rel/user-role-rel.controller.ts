@@ -18,7 +18,7 @@ import {
 } from './dto/user-role-rel.dto';
 import { Roles } from '../auth/auth.roles.decorator';
 import { UserRoleRelService } from './user-role-rel.service';
-import { USER_ROLE_RELATION_MODEL } from './constants/constants';
+import { USER_ROLE_RELATION_MODEL } from '../constants';
 import { Response } from 'express';
 
 @ApiBearerAuth()

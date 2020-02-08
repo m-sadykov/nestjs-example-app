@@ -1,7 +1,6 @@
-import { USER_MODEL } from './constants/constants';
+import { USER_MODEL, DATABASE_CONNECTION } from '../constants';
 import { Connection } from 'mongoose';
 import { UserSchema } from './schema/user.schema';
-import { DATABASE_CONNECTION } from '../database/constants';
 
 export const usersProviders = [
   {

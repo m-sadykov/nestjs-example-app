@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { UserRoleRel } from './interface/user-role-rel';
-import { USER_ROLE_RELATION_MODEL } from './constants/constants';
+import { USER_ROLE_RELATION_MODEL } from '../constants';
 import { CreateRelDto } from './dto/user-role-rel.dto';
 
 @Injectable()

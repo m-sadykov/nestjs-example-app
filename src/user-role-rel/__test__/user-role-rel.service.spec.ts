@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import { UserRoleRelService } from '../user-role-rel.service';
 import { Test } from '@nestjs/testing';
-import { USER_ROLE_RELATION_MODEL } from '../constants/constants';
+import { USER_ROLE_RELATION_MODEL } from '../../constants';
 
 describe('UserRoleRelService', () => {
   const userRoleRelModel = {

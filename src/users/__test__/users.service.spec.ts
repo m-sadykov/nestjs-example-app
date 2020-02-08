@@ -1,9 +1,11 @@
 import 'reflect-metadata';
 import { UsersService } from '../users.service';
 import { Test } from '@nestjs/testing';
-import { USER_MODEL } from '../constants/constants';
-import { ROLE_MODEL } from '../../roles/constants/constants';
-import { USER_ROLE_RELATION_MODEL } from '../../user-role-rel/constants/constants';
+import {
+  USER_MODEL,
+  ROLE_MODEL,
+  USER_ROLE_RELATION_MODEL,
+} from '../../constants';
 import { AuthenticatedUser } from '../interface/user';
 
 describe('Users Service', () => {

@@ -3,7 +3,7 @@ import { Test } from '@nestjs/testing';
 import { UserRoleRelController } from '../user-role-rel.controller';
 import { UserRoleRelService } from '../user-role-rel.service';
 import { DatabaseService } from '../../database/database.service';
-import { USER_ROLE_RELATION_MODEL } from '../constants/constants';
+import { USER_ROLE_RELATION_MODEL } from '../../constants';
 import { UserRoleRelSchema } from '../schema/user-role-rel.schema';
 
 describe('UserRolRel Controller', () => {
