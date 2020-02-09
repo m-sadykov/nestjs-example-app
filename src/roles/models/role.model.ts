@@ -1,13 +1,12 @@
-import { Document, Schema } from 'mongoose';
-
-type ObjectId = Schema.Types.ObjectId;
+import { Document } from 'mongoose';
+import { ObjectId } from '../../common';
 
 export interface RoleDocument extends Document {
-  id: ObjectId;
-  name: string;
-  displayName: string;
-  description: string;
-  isDeleted: boolean;
+  readonly _id: ObjectId;
+  readonly name: string;
+  readonly displayName: string;
+  readonly description: string;
+  readonly isDeleted: boolean;
 }
 
 export type Role = {

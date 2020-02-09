@@ -27,7 +27,7 @@ interface IRolesService {
 
   update(id: string, patch: RoleForUpdate): Promise<Role>;
 
-  delete(id: string): Promise<void>;
+  delete(id: string): Promise<Role>;
 }
 
 @Injectable()
@@ -54,11 +54,19 @@ export class RolesService implements IRolesService {
     return this.rolesRepo.create(role);
   }
 
-  getAll = this.rolesRepo.getAll;
+  async getAll(): Promise<Role[]> {
+    return this.rolesRepo.getAll();
+  }
 
-  findOne = this.rolesRepo.findOne;
+  async findOne(id: string): Promise<Role> {
+    return this.rolesRepo.findOne(id);
+  }
 
-  update = this.rolesRepo.update;
+  async update(id: string, patch: RoleForUpdate): Promise<Role> {
+    return this.rolesRepo.update(id, patch);
+  }
 
-  delete = this.rolesRepo.delete;
+  async delete(id: string): Promise<Role> {
+    return this.rolesRepo.delete(id);
+  }
 }

@@ -68,7 +68,7 @@ export class RolesController {
     status: 200,
     description: 'Role has bee successfully removed',
   })
-  async removeRole(@Param(':id') id: string): Promise<void> {
+  async removeRole(@Param('id') id: string): Promise<Role> {
     return this.rolesService.delete(id);
   }
 }

@@ -5,12 +5,12 @@ import { UsersModule } from '../users/users.module';
 import { RolesService } from './roles.service';
 import { rolesProviders } from './roles.providers';
 import { DatabaseModule } from '../database/database.module';
-import { RolesRepository } from './roles.repository';
+import { RolesRepository, RolesMapper } from './roles.repository';
 
 @Module({
   imports: [DatabaseModule, UsersModule],
   controllers: [RolesController],
-  providers: [RolesService, RolesRepository, ...rolesProviders],
+  providers: [RolesService, RolesRepository, RolesMapper, ...rolesProviders],
 })
 export class RolesModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

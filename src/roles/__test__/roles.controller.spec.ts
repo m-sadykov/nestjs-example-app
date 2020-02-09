@@ -2,7 +2,7 @@ import 'reflect-metadata';
 import { Test } from '@nestjs/testing';
 import { RolesController } from '../roles.controller';
 import { RolesService } from '../roles.service';
-import { RolesRepository } from '../roles.repository';
+import { RolesRepository, RolesMapper } from '../roles.repository';
 import { RoleSchema } from '../schema/role.schema';
 import { ROLE_MODEL } from '../../constants';
 import { Role } from '../models/role.model';
@@ -21,6 +21,7 @@ describe('Roles Controller', () => {
       providers: [
         RolesService,
         RolesRepository,
+        RolesMapper,
         {
           provide: ROLE_MODEL,
           useValue: RoleSchema,
@@ -113,15 +114,19 @@ describe('Roles Controller', () => {
   describe('removeRole', () => {
     it('should remove role by id', async () => {
       const id = 'some_id';
+      const deletedRole = {
+        ...getMockRole(),
+        isDeleted: true,
+      };
 
       jest.spyOn(rolesService, 'delete').mockImplementationOnce(
-        (): Promise<void> => {
-          return undefined;
+        (): Promise<Role> => {
+          return Promise.resolve(deletedRole);
         },
       );
 
-      const deletionResult = await rolesController.removeRole(id);
-      expect(deletionResult).toBe(undefined);
+      const roleForDelete = await rolesController.removeRole(id);
+      expect(roleForDelete.isDeleted).toBe(true);
     });
   });
 
