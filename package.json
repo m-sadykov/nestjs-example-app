@@ -1,11 +1,11 @@
 {
   "name": "nestjs-example-app",
   "version": "0.0.1",
-  "description": "",
-  "author": "",
+  "description": "A sample nest js project for self training purpose",
+  "author": "Marat Sadykov",
   "license": "MIT",
   "scripts": {
-    "build": "rimraf dist && tsc -p tsconfig.build.json",
+    "build": "tsc",
     "start": "ts-node -r tsconfig-paths/register src/main.ts",
     "start:dev": "tsc-watch -p tsconfig.build.json --onSuccess \"node dist/src/main.js\"",
     "lint": "tslint -p tsconfig.json -c tslint.json",
@@ -38,7 +38,7 @@
     "@types/express": "4.16.1",
     "@types/hapi__joi": "^16.0.1",
     "@types/jest": "24.0.11",
-    "@types/node": "11.13.4",
+    "@types/node": "^13.7.0",
     "@types/supertest": "2.0.7",
     "jest": "24.7.1",
     "prettier": "1.17.0",
@@ -48,7 +48,7 @@
     "tsc-watch": "2.2.1",
     "tsconfig-paths": "3.8.0",
     "tslint": "5.16.0",
-    "typescript": "3.4.3"
+    "typescript": "^3.7.5"
   },
   "jest": {
     "moduleFileExtensions": [

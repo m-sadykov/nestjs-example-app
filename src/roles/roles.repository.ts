@@ -1,12 +1,8 @@
-import {
-  Role,
-  RoleForCreate,
-  RoleForUpdate,
-  RoleDocument,
-} from './models/role.model';
+import { Role, RoleForCreate, RoleForUpdate } from './models/role.model';
 import { Inject } from '@nestjs/common';
 import { ROLE_MODEL } from '../constants';
 import { Model } from 'mongoose';
+import { RoleDocument } from './schema/role.schema';
 
 interface IRolesRepository {
   create(role: RoleForCreate): Promise<Role>;

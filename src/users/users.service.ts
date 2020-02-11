@@ -6,8 +6,8 @@ import {
 } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { User, AuthenticatedUser } from './interface/user';
-import { UserRoleRel } from '../user-role-rel/interface/user-role-rel';
-import { RoleDocument } from '../roles/models/role.model';
+import { UserRoleRelDocument } from '../user-role-rel/schema/user-role-rel.schema';
+import { RoleDocument } from '../roles/schema/role.schema';
 import { USER_MODEL, USER_ROLE_RELATION_MODEL, ROLE_MODEL } from '../constants';
 import { CreateUserDto } from './dto/user.dto';
 
@@ -17,7 +17,7 @@ export class UsersService implements OnModuleInit {
     @Inject(USER_MODEL)
     private readonly userModel: Model<User>,
     @Inject(USER_ROLE_RELATION_MODEL)
-    private readonly userRoleRel: Model<UserRoleRel>,
+    private readonly userRoleRel: Model<UserRoleRelDocument>,
     @Inject(ROLE_MODEL)
     private readonly roleModel: Model<RoleDocument>,
   ) {}

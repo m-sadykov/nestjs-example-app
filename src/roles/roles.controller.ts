@@ -15,7 +15,6 @@ import {
 import { ApiUseTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { Roles } from '../auth/auth.roles.decorator';
 import { RolesService } from './roles.service';
-import { Role } from './models/role.model';
 
 @ApiBearerAuth()
 @ApiUseTags('roles')
@@ -26,14 +25,14 @@ export class RolesController {
   @Get()
   @Roles(['admin', 'writer'])
   @ApiResponse({ status: 200, type: [RolePresentationDto] })
-  async getAll(): Promise<Role[]> {
+  async getAll(): Promise<RolePresentationDto[]> {
     return this.rolesService.getAll();
   }
 
   @Get(':id')
   @Roles(['admin', 'writer'])
   @ApiResponse({ status: 200, type: RolePresentationDto })
-  async findOne(@Param('id') id: string): Promise<Role> {
+  async findOne(@Param('id') id: string): Promise<RolePresentationDto> {
     return this.rolesService.findOne(id);
   }
 
@@ -44,7 +43,9 @@ export class RolesController {
     type: RolePresentationDto,
     description: 'Role has been successfully created.',
   })
-  async createRole(@Body() createRoleDto: CreateRoleDto): Promise<Role> {
+  async createRole(
+    @Body() createRoleDto: CreateRoleDto,
+  ): Promise<RolePresentationDto> {
     return this.rolesService.create(createRoleDto);
   }
 
@@ -58,7 +59,7 @@ export class RolesController {
   async updateRole(
     @Param('id') id: string,
     @Body() updateRoleDto: UpdateRoleDto,
-  ): Promise<Role> {
+  ): Promise<RolePresentationDto> {
     return this.rolesService.update(id, updateRoleDto);
   }
 
@@ -68,7 +69,7 @@ export class RolesController {
     status: 200,
     description: 'Role has bee successfully removed',
   })
-  async removeRole(@Param('id') id: string): Promise<Role> {
+  async removeRole(@Param('id') id: string): Promise<RolePresentationDto> {
     return this.rolesService.delete(id);
   }
 }

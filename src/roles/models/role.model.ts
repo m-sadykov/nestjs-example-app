@@ -1,16 +1,7 @@
-import { Document } from 'mongoose';
 import { ObjectId } from '../../common';
 
-export interface RoleDocument extends Document {
-  readonly _id: ObjectId;
-  readonly name: string;
-  readonly displayName: string;
-  readonly description: string;
-  readonly isDeleted: boolean;
-}
-
 export type Role = {
-  id: ObjectId;
+  readonly id: ObjectId;
   name: string;
   displayName: string;
   description: string;
