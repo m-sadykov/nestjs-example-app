@@ -20,7 +20,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "NestJS Test",
+      "name": "Debug app",
       "program": "${workspaceFolder}/dist/src/main.js"
     },
     {

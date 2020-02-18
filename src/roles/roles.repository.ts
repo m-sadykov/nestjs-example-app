@@ -1,17 +1,15 @@
 import { Role, RoleForCreate, RoleForUpdate } from './models/role.model';
-import { Inject } from '@nestjs/common';
-import { ROLE_MODEL } from '../constants';
 import { Model } from 'mongoose';
 import { RoleDocument } from './schema/role.schema';
 
-interface IRolesRepository {
+export interface IRolesRepository {
   create(role: RoleForCreate): Promise<Role>;
 
   getAll(): Promise<Role[]>;
 
   findOne(id: string): Promise<Role>;
 
-  findByName(name: string): Promise<Role>;
+  isRoleAlreadyExists(name: string): Promise<boolean>;
 
   update(id: string, patch: RoleForUpdate): Promise<Role>;
 
@@ -25,7 +23,7 @@ interface IRolesMapper {
 export class RolesMapper implements IRolesMapper {
   fromEntity(entity: any): Role {
     return {
-      id: entity._id,
+      id: entity._id.toString(),
       name: entity.name,
       description: entity.description,
       displayName: entity.displayName,
@@ -38,13 +36,12 @@ export class RolesMapper implements IRolesMapper {
 
 export class RolesRepository implements IRolesRepository {
   constructor(
-    @Inject(ROLE_MODEL)
     private readonly database: Model<RoleDocument>,
-    private readonly mapper: RolesMapper,
+    private readonly mapper: IRolesMapper,
   ) {}
 
   async create(role: RoleForCreate): Promise<Role> {
-    const createdRole = this.database.create(role);
+    const createdRole = await this.database.create(role);
 
     return this.mapper.fromEntity(createdRole);
   }
@@ -65,14 +62,14 @@ export class RolesRepository implements IRolesRepository {
     return this.mapper.fromEntity(role);
   }
 
-  async findByName(name: string): Promise<Role> {
+  async isRoleAlreadyExists(name: string): Promise<boolean> {
     const [role] = await this.database.find({ name });
 
     if (role) {
-      throw new Error(`Role with ${name} already exists`);
+      return true;
     }
 
-    return this.mapper.fromEntity(role);
+    return false;
   }
 
   async update(id: string, patch: RoleForUpdate): Promise<Role> {

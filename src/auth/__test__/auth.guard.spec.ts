@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 import { AuthGuard } from '../auth.guard';
-import { AuthenticatedRequest, AuthMiddleware } from '../auth.middleware';
+import { AuthenticatedRequest, authenticate as _authenticate } from '../auth.middleware';
 
 describe('Auth Guard', () => {
   const reflector = {
@@ -10,7 +10,7 @@ describe('Auth Guard', () => {
   const userService = {
     validate: jest.fn(),
   };
-  const authMiddleware = new AuthMiddleware(userService as any);
+  const authenticate = _authenticate(userService as any);
   const response = {};
   const next = jest.fn();
   const context = {
@@ -19,13 +19,12 @@ describe('Auth Guard', () => {
   };
   const roles: string[] = ['admin', 'reader', 'writer'];
 
-  let mockGetHandler;
+  let mockGetHandler = jest.fn();
 
   async function mockAuthenticateUserImplementationOnce(mockUser: any) {
     const request: AuthenticatedRequest = {
       headers: {
-        authorization:
-          'Basic ' + Buffer.from('username:password').toString('base64'),
+        authorization: 'Basic ' + Buffer.from('username:password').toString('base64'),
       },
     };
 
@@ -39,7 +38,7 @@ describe('Auth Guard', () => {
 
     userService.validate.mockResolvedValueOnce(Promise.resolve(mockUser));
 
-    await authMiddleware.use(request, response as any, next);
+    await authenticate(request, response as any, next);
   }
 
   it('should return true if user has roles assigned', async () => {

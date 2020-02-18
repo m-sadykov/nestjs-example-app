@@ -1,6 +1,5 @@
 import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
 import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
-import { ObjectId } from '../../common';
 
 export class CreateRoleDto {
   @IsString()
@@ -38,7 +37,7 @@ export class UpdateRoleDto {
 
 export class RolePresentationDto {
   @ApiModelProperty()
-  id: ObjectId;
+  id: string;
 
   @ApiModelProperty()
   name: string;

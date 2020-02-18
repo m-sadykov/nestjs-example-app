@@ -1,7 +1,5 @@
-import { ObjectId } from '../../common';
-
 export type Role = {
-  readonly id: ObjectId;
+  readonly id: string;
   name: string;
   displayName: string;
   description: string;

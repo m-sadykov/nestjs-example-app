@@ -1,27 +1,51 @@
-import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
+import { Module, DynamicModule, Inject, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { UsersController } from './users.controller';
-import { UsersService } from './users.service';
-import { DatabaseService } from '../database/database.service';
-import { AuthMiddleware } from '../auth/auth.middleware';
-import { DatabaseModule } from '../database/database.module';
-import { usersProviders } from './users.providers';
-import { rolesProviders } from '../roles/roles.providers';
-import { userRoleRelProviders } from '../user-role-rel/user-role-rel.providers';
+import { IUsersService } from './users.service';
+import { IRolesService } from '../roles/roles.service';
+import { IUserRoleRelService } from '../user-role-rel/user-role-rel.service';
+import {
+  ROLES_SERVICE,
+  USER_ROLE_RELATION_SERVICE,
+  USERS_SERVICE,
+  AUTHENTICATE,
+} from '../constants';
+import { Authenticate } from '../auth/auth.middleware';
 
-@Module({
-  imports: [DatabaseModule],
-  controllers: [UsersController],
-  providers: [
-    UsersService,
-    DatabaseService,
-    ...usersProviders,
-    ...rolesProviders,
-    ...userRoleRelProviders,
-  ],
-  exports: [UsersService],
-})
+@Module({})
 export class UsersModule implements NestModule {
+  static forRoot(dependencies: {
+    usersService: IUsersService;
+    rolesService: IRolesService;
+    userRoleRelService: IUserRoleRelService;
+    authenticate: Authenticate;
+  }): DynamicModule {
+    return {
+      module: UsersModule,
+      controllers: [UsersController],
+      providers: [
+        {
+          provide: USERS_SERVICE,
+          useValue: dependencies.usersService,
+        },
+        {
+          provide: ROLES_SERVICE,
+          useValue: dependencies.rolesService,
+        },
+        {
+          provide: USER_ROLE_RELATION_SERVICE,
+          useValue: dependencies.userRoleRelService,
+        },
+        {
+          provide: AUTHENTICATE,
+          useValue: dependencies.authenticate,
+        },
+      ],
+    };
+  }
+
+  constructor(@Inject(AUTHENTICATE) private readonly authenticate: Authenticate) {}
+
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(AuthMiddleware).forRoutes(UsersController);
+    consumer.apply(this.authenticate).forRoutes(UsersController);
   }
 }

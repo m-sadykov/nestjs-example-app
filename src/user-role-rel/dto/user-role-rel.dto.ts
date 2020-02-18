@@ -1,9 +1,8 @@
 import { ApiModelProperty } from '@nestjs/swagger';
-import { ObjectId } from '../../common';
 
 export class UserRoleRelPresentationDto {
   @ApiModelProperty()
-  id: ObjectId;
+  id: string;
 
   @ApiModelProperty()
   userId: string;

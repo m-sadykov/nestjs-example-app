@@ -1,7 +1,5 @@
-import { ObjectId } from '../../common';
-
 export type UserRoleRelation = {
-  readonly id: ObjectId;
+  readonly id: string;
   userId: string;
   roleId: string;
   isDeleted: boolean;

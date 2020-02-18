@@ -1,32 +1,47 @@
 import {
   Injectable,
-  Inject,
   UnauthorizedException,
   OnModuleInit,
+  BadRequestException,
+  NotFoundException,
+  Inject,
 } from '@nestjs/common';
-import { Model } from 'mongoose';
-import { User, AuthenticatedUser } from './interface/user';
-import { UserRoleRelDocument } from '../user-role-rel/schema/user-role-rel.schema';
-import { RoleDocument } from '../roles/schema/role.schema';
-import { USER_MODEL, USER_ROLE_RELATION_MODEL, ROLE_MODEL } from '../constants';
-import { CreateUserDto } from './dto/user.dto';
+import { AuthenticatedUser, UserForCreate, User, UserForUpdate } from './models/user.model';
+import { IUsersRepository } from './users.repository';
+import { IRolesService } from '../roles/roles.service';
+import { RoleForCreate } from '../roles/models/role.model';
+import { IUserRoleRelService } from '../user-role-rel/user-role-rel.service';
+import { ROLES_SERVICE, USER_ROLE_RELATION_SERVICE } from '../constants';
+
+export interface IUsersService {
+  validate(username: string, password: string): Promise<AuthenticatedUser>;
+
+  getAll(): Promise<User[]>;
+
+  findOne(id: string): Promise<User>;
+
+  addUser(user: UserForCreate): Promise<User>;
+
+  updateUser(id: string, patch: UserForUpdate): Promise<User>;
+
+  removeUser(id: string): Promise<User>;
+}
 
 @Injectable()
-export class UsersService implements OnModuleInit {
+export class UsersService implements IUsersService, OnModuleInit {
   constructor(
-    @Inject(USER_MODEL)
-    private readonly userModel: Model<User>,
-    @Inject(USER_ROLE_RELATION_MODEL)
-    private readonly userRoleRel: Model<UserRoleRelDocument>,
-    @Inject(ROLE_MODEL)
-    private readonly roleModel: Model<RoleDocument>,
+    private readonly usersRepo: IUsersRepository,
+    @Inject(ROLES_SERVICE)
+    private readonly rolesService: IRolesService,
+    @Inject(USER_ROLE_RELATION_SERVICE)
+    private readonly userRoleRelService: IUserRoleRelService,
   ) {}
 
   async onModuleInit() {
     const isUserExists = await this.isUserAlreadyExists('admin');
 
     if (!isUserExists) {
-      const user: CreateUserDto = {
+      const user: UserForCreate = {
         username: 'admin',
         password: '123',
       };
@@ -36,19 +51,17 @@ export class UsersService implements OnModuleInit {
       console.info(`Admin user created with password ${user.password}`);
       return admin;
     }
+
+    return;
   }
 
-  async validate(
-    username: string,
-    password: string,
-  ): Promise<AuthenticatedUser> {
+  async validate(username: string, password: string): Promise<AuthenticatedUser> {
     const query = { username, password };
-
-    const [user] = await this.userModel.find(query);
+    const [user] = await this.usersRepo.getAll(query);
 
     if (user) {
-      const [userRoleRel] = await this.userRoleRel.find({ userId: user._id });
-      const role = await this.roleModel.findById(userRoleRel.roleId);
+      const [userRoleRel] = await this.userRoleRelService.getByAccount(user.id);
+      const role = await this.rolesService.findOne(userRoleRel.roleId);
 
       return {
         username: user.username,
@@ -59,10 +72,9 @@ export class UsersService implements OnModuleInit {
     }
   }
 
-  async isUserAlreadyExists(username: string): Promise<boolean> {
+  private async isUserAlreadyExists(username: string): Promise<boolean> {
     const query = { username };
-
-    const [user] = await this.userModel.find(query);
+    const [user] = await this.usersRepo.getAll(query);
 
     if (user) {
       return true;
@@ -71,24 +83,62 @@ export class UsersService implements OnModuleInit {
     return false;
   }
 
-  private async createAdminUser(user: CreateUserDto) {
-    const role = {
+  private async createAdminUser(user: UserForCreate) {
+    const role: RoleForCreate = {
       name: 'admin',
       displayName: 'ADMIN',
       description: 'admin role with access to all API routes',
     };
 
-    const createdUser = await this.userModel.create(user);
-
-    const createdRole = await this.roleModel.create(role);
+    const createdUser = await this.usersRepo.create(user);
+    const createdRole = await this.rolesService.create(role);
 
     const relation = {
-      userId: createdUser._id,
-      roleId: createdRole._id,
+      userId: createdUser.id,
+      roleId: createdRole.id,
     };
 
-    await this.userRoleRel.create(relation);
+    await this.userRoleRelService.create(relation);
 
     return createdUser;
+  }
+
+  async getAll(): Promise<User[]> {
+    return this.usersRepo.getAll();
+  }
+
+  async findOne(id: string): Promise<User> {
+    return this.usersRepo.findOne(id);
+  }
+
+  async addUser(user: UserForCreate): Promise<User> {
+    const { username } = user;
+    const isUserExists = await this.isUserAlreadyExists(username);
+
+    if (isUserExists) {
+      throw new BadRequestException(`User ${username} already exists`);
+    }
+
+    return this.usersRepo.create(user);
+  }
+
+  async updateUser(id: string, patch: UserForUpdate): Promise<User> {
+    const user = await this.usersRepo.findOne(id);
+
+    if (!user) {
+      throw new NotFoundException(`User ${id} not found`);
+    }
+
+    return this.usersRepo.update(id, patch);
+  }
+
+  async removeUser(id: string): Promise<User> {
+    const user = await this.usersRepo.findOne(id);
+
+    if (!user) {
+      throw new NotFoundException(`User ${id} not found`);
+    }
+
+    return this.usersRepo.delete(id);
   }
 }

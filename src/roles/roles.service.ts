@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { RoleForCreate, Role, RoleForUpdate } from './models/role.model';
-import { RolesRepository } from './roles.repository';
+import { IRolesRepository } from './roles.repository';
 
 export class RoleNotFoundError extends Error {
   constructor(message: string) {
@@ -18,7 +18,7 @@ export class RoleAlreadyExistsError extends Error {
   }
 }
 
-interface IRolesService {
+export interface IRolesService {
   create(role: RoleForCreate): Promise<Role>;
 
   getAll(): Promise<Role[]>;
@@ -32,23 +32,13 @@ interface IRolesService {
 
 @Injectable()
 export class RolesService implements IRolesService {
-  constructor(private readonly rolesRepo: RolesRepository) {}
-
-  private async isRoleAlreadyExists(name: string): Promise<boolean> {
-    const role = await this.rolesRepo.findByName(name);
-
-    if (role) {
-      return true;
-    }
-
-    return false;
-  }
+  constructor(private readonly rolesRepo: IRolesRepository) {}
 
   async create(role: RoleForCreate): Promise<Role> {
-    const isRoleExists = await this.isRoleAlreadyExists(role.name);
+    const isRoleExists = await this.rolesRepo.isRoleAlreadyExists(role.name);
 
     if (isRoleExists) {
-      throw new Error(`Role name ${name} already exists.`);
+      throw new Error(`Role name ${role.name} already exists.`);
     }
 
     return this.rolesRepo.create(role);

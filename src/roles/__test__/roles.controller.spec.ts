@@ -1,37 +1,21 @@
 import 'reflect-metadata';
-import { Test } from '@nestjs/testing';
-import { RolesController } from '../roles.controller';
-import { RolesService } from '../roles.service';
-import { RolesRepository, RolesMapper } from '../roles.repository';
-import { RoleSchema } from '../schema/role.schema';
-import { ROLE_MODEL } from '../../constants';
 import { Role } from '../models/role.model';
-import { Schema } from 'mongoose';
-
-const objectId = Schema.Types.ObjectId;
+import { RolesController } from '../roles.controller';
+import { IRolesService } from '../roles.service';
 
 describe('Roles Controller', () => {
   let rolesController: RolesController;
-  let rolesService: RolesService;
-  let rolesRepository: RolesRepository;
+
+  const rolesService: IRolesService = {
+    create: jest.fn(),
+    delete: jest.fn(),
+    findOne: jest.fn(),
+    getAll: jest.fn(),
+    update: jest.fn(),
+  };
 
   beforeEach(async () => {
-    const module = await Test.createTestingModule({
-      controllers: [RolesController],
-      providers: [
-        RolesService,
-        RolesRepository,
-        RolesMapper,
-        {
-          provide: ROLE_MODEL,
-          useValue: RoleSchema,
-        },
-      ],
-    }).compile();
-
-    rolesController = module.get<RolesController>(RolesController);
-    rolesService = module.get<RolesService>(RolesService);
-    rolesRepository = module.get<RolesRepository>(RolesRepository);
+    rolesController = new RolesController(rolesService);
   });
 
   describe('getAll', () => {
@@ -52,9 +36,7 @@ describe('Roles Controller', () => {
       const id = 'some_id';
       const mockRole = getMockRole();
 
-      jest
-        .spyOn(rolesService, 'findOne')
-        .mockImplementationOnce((): any => mockRole);
+      jest.spyOn(rolesService, 'findOne').mockImplementationOnce((): any => mockRole);
 
       const role = await rolesController.findOne(id);
       expect(role).toBe(mockRole);
@@ -132,7 +114,7 @@ describe('Roles Controller', () => {
 
   const getMockRole = (): Role => {
     return {
-      id: new objectId('role_id'),
+      id: 'role_id',
       name: 'role',
       displayName: 'SOME_ROLE',
       description: 'some text',

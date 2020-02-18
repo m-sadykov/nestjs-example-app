@@ -30,5 +30,5 @@ export class UserPresentationDto {
   username: string;
 
   @ApiModelProperty()
-  password: string;
+  isDeleted: boolean;
 }

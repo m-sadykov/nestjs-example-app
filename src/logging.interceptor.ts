@@ -1,13 +1,8 @@
-import {
-  Injectable,
-  NestInterceptor,
-  ExecutionContext,
-  CallHandler,
-} from '@nestjs/common';
+import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nestjs/common';
 import { Logger } from 'winston';
 import { Request } from 'express';
 import { Observable, throwError } from 'rxjs';
-import { tap, catchError } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
@@ -15,39 +10,18 @@ export class LoggingInterceptor implements NestInterceptor {
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const request: Request = context.switchToHttp().getRequest();
+    const { url, method } = request;
 
     return next.handle().pipe(
-      tap(this.logSuccess.bind(this, request)),
       catchError(error => {
-        const isHandled = Boolean(error.statusCode);
-
-        if (isHandled) {
-          this.logSuccess(request);
-        } else {
-          this.logError(request, error);
-        }
+        this.logger.error({
+          url,
+          method,
+          message: error.message,
+        });
 
         return throwError(error);
       }),
     );
-  }
-
-  private logSuccess(request: Request) {
-    this.logger.info({
-      req: this.requestToJSON(request),
-    });
-  }
-
-  private logError(request: Request, error: Error) {
-    this.logger.error({
-      req: this.requestToJSON(request),
-      error: error.message,
-    });
-  }
-
-  private requestToJSON(request: Request) {
-    const { method, originalUrl: url, headers } = request;
-
-    return { method, url, headers };
   }
 }

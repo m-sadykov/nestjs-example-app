@@ -1,30 +1,31 @@
 import 'reflect-metadata';
-import { AuthMiddleware, AuthenticatedRequest } from '../auth.middleware';
+import { AuthenticatedUser } from '../../users/models/user.model';
+import { authenticate as _authenticate, AuthenticatedRequest } from '../auth.middleware';
 
 describe('Auth middleware', () => {
   const userService = {
     validate: jest.fn(),
   };
-  const authMiddleware = new AuthMiddleware(userService as any);
+  const authenticate = _authenticate(userService as any);
   const response = {};
   const next = jest.fn();
 
   it('should modify request globally with authenticated user', async () => {
     const request: AuthenticatedRequest = {
       headers: {
-        authorization:
-          'Basic ' + Buffer.from(`username:password`).toString('base64'),
+        authorization: 'Basic ' + Buffer.from(`username:password`).toString('base64'),
       },
     };
 
-    userService.validate.mockResolvedValueOnce(
-      Promise.resolve({
-        username: 'username',
-        roles: ['role'],
-      }),
+    jest.spyOn(userService, 'validate').mockImplementationOnce(
+      async (): Promise<AuthenticatedUser> =>
+        (request.user = {
+          username: 'username',
+          roles: ['role'],
+        }),
     );
 
-    await authMiddleware.use(request, response as any, next);
+    await authenticate(request, response as any, next);
 
     expect(request.user).toMatchObject({
       username: 'username',
@@ -37,14 +38,16 @@ describe('Auth middleware', () => {
       headers: {},
     };
 
-    userService.validate.mockImplementationOnce(() => {
-      return {
-        statusCode: 401,
-      };
-    });
+    jest.spyOn(userService, 'validate').mockImplementationOnce(
+      async (): Promise<AuthenticatedUser> =>
+        (request.user = {
+          username: 'username',
+          roles: ['role'],
+        }),
+    );
 
     try {
-      await authMiddleware.use(request, response as any, next);
+      await authenticate(request, response as any, next);
     } catch (error) {
       expect(error.status).toBe(401);
       expect(error.response).toMatchObject({
@@ -57,19 +60,20 @@ describe('Auth middleware', () => {
   it('should throw Unauthorized exception if user provided wrong login or password', async () => {
     const request: AuthenticatedRequest = {
       headers: {
-        authorization:
-          'Basic ' + Buffer.from(`wronguser:wrongpassword`).toString('base64'),
+        authorization: 'Basic ' + Buffer.from(`wronguser:wrongpassword`).toString('base64'),
       },
     };
 
-    userService.validate.mockImplementationOnce(() => {
-      return {
-        statusCode: 401,
-      };
-    });
+    jest.spyOn(userService, 'validate').mockImplementationOnce(
+      async (): Promise<AuthenticatedUser> =>
+        (request.user = {
+          username: 'username',
+          roles: ['role'],
+        }),
+    );
 
     try {
-      await authMiddleware.use(request, response as any, next);
+      await authenticate(request, response as any, next);
     } catch (error) {
       expect(error.status).toBe(401);
       expect(error.response).toMatchObject({
@@ -82,19 +86,20 @@ describe('Auth middleware', () => {
   it('should throw Unauthorized exception if user does not exists in system', async () => {
     const request: AuthenticatedRequest = {
       headers: {
-        authorization:
-          'Basic ' + Buffer.from(`notexists:pwd`).toString('base64'),
+        authorization: 'Basic ' + Buffer.from(`notexists:pwd`).toString('base64'),
       },
     };
 
-    userService.validate.mockImplementationOnce(() => {
-      return {
-        statusCode: 401,
-      };
-    });
+    jest.spyOn(userService, 'validate').mockImplementationOnce(
+      async (): Promise<AuthenticatedUser> =>
+        (request.user = {
+          username: 'username',
+          roles: ['role'],
+        }),
+    );
 
     try {
-      await authMiddleware.use(request, response as any, next);
+      await authenticate(request, response as any, next);
     } catch (error) {
       expect(error.status).toBe(401);
       expect(error.response).toMatchObject({
@@ -111,14 +116,14 @@ describe('Auth middleware', () => {
       },
     };
 
-    userService.validate.mockImplementationOnce(() => new Error());
+    jest
+      .spyOn(userService, 'validate')
+      .mockImplementationOnce(async (): Promise<any> => new Error());
 
     try {
-      await authMiddleware.use(request, response as any, next);
+      await authenticate(request, response as any, next);
     } catch (error) {
-      expect(error.message).toBe(
-        'Error on authenticate, something went wrong.',
-      );
+      expect(error.message).toBe('Error on authenticate, something went wrong.');
     }
   });
 });

@@ -1,19 +1,34 @@
-import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
+import { Module, DynamicModule, NestModule, MiddlewareConsumer, Inject } from '@nestjs/common';
 import { RolesController } from './roles.controller';
-import { AuthMiddleware } from '../auth/auth.middleware';
-import { UsersModule } from '../users/users.module';
-import { RolesService } from './roles.service';
-import { rolesProviders } from './roles.providers';
-import { DatabaseModule } from '../database/database.module';
-import { RolesRepository, RolesMapper } from './roles.repository';
+import { IRolesService } from './roles.service';
+import { ROLES_SERVICE, AUTHENTICATE } from '../constants';
+import { Authenticate } from '../auth/auth.middleware';
 
-@Module({
-  imports: [DatabaseModule, UsersModule],
-  controllers: [RolesController],
-  providers: [RolesService, RolesRepository, RolesMapper, ...rolesProviders],
-})
+@Module({})
 export class RolesModule implements NestModule {
+  static forRoot(dependencies: {
+    rolesService: IRolesService;
+    authenticate: Authenticate;
+  }): DynamicModule {
+    return {
+      module: RolesModule,
+      controllers: [RolesController],
+      providers: [
+        {
+          provide: ROLES_SERVICE,
+          useValue: dependencies.rolesService,
+        },
+        {
+          provide: AUTHENTICATE,
+          useValue: dependencies.authenticate,
+        },
+      ],
+    };
+  }
+
+  constructor(@Inject('AUTHENTICATE') private readonly authenticate: Authenticate) {}
+
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(AuthMiddleware).forRoutes(RolesController);
+    consumer.apply(this.authenticate).forRoutes(RolesController);
   }
 }

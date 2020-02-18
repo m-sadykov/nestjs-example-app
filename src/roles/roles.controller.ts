@@ -1,26 +1,18 @@
-import {
-  Controller,
-  Get,
-  Param,
-  Post,
-  Body,
-  Patch,
-  Delete,
-} from '@nestjs/common';
-import {
-  CreateRoleDto,
-  UpdateRoleDto,
-  RolePresentationDto,
-} from './dto/role.dto';
+import { Controller, Get, Param, Post, Body, Patch, Delete, Inject } from '@nestjs/common';
+import { CreateRoleDto, UpdateRoleDto, RolePresentationDto } from './dto/role.dto';
 import { ApiUseTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { Roles } from '../auth/auth.roles.decorator';
-import { RolesService } from './roles.service';
+import { IRolesService } from './roles.service';
+import { ROLES_SERVICE } from '../constants';
 
 @ApiBearerAuth()
 @ApiUseTags('roles')
 @Controller('roles')
 export class RolesController {
-  constructor(private readonly rolesService: RolesService) {}
+  constructor(
+    @Inject(ROLES_SERVICE)
+    private readonly rolesService: IRolesService,
+  ) {}
 
   @Get()
   @Roles(['admin', 'writer'])
@@ -43,9 +35,7 @@ export class RolesController {
     type: RolePresentationDto,
     description: 'Role has been successfully created.',
   })
-  async createRole(
-    @Body() createRoleDto: CreateRoleDto,
-  ): Promise<RolePresentationDto> {
+  async createRole(@Body() createRoleDto: CreateRoleDto): Promise<RolePresentationDto> {
     return this.rolesService.create(createRoleDto);
   }
 
