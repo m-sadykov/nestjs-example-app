@@ -1,6 +1,5 @@
 import {
   Injectable,
-  UnauthorizedException,
   OnModuleInit,
   BadRequestException,
   NotFoundException,

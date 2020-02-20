@@ -8,7 +8,7 @@ describe('Auth Guard', () => {
   };
   const authGuard = new AuthGuard(reflector as any);
   const userService = {
-    validate: jest.fn(),
+    getUserCredentials: jest.fn(),
   };
   const authenticate = _authenticate(userService as any);
   const response = {};
@@ -36,7 +36,7 @@ describe('Auth Guard', () => {
       };
     });
 
-    userService.validate.mockResolvedValueOnce(Promise.resolve(mockUser));
+    userService.getUserCredentials.mockResolvedValueOnce(Promise.resolve(mockUser));
 
     await authenticate(request, response as any, next);
   }

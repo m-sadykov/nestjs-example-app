@@ -4,7 +4,7 @@ import { authenticate as _authenticate, AuthenticatedRequest } from '../auth.mid
 
 describe('Auth middleware', () => {
   const userService = {
-    validate: jest.fn(),
+    getUserCredentials: jest.fn(),
   };
   const authenticate = _authenticate(userService as any);
   const response = {};
@@ -17,7 +17,7 @@ describe('Auth middleware', () => {
       },
     };
 
-    jest.spyOn(userService, 'validate').mockImplementationOnce(
+    jest.spyOn(userService, 'getUserCredentials').mockImplementationOnce(
       async (): Promise<AuthenticatedUser> =>
         (request.user = {
           username: 'username',
@@ -38,7 +38,7 @@ describe('Auth middleware', () => {
       headers: {},
     };
 
-    jest.spyOn(userService, 'validate').mockImplementationOnce(
+    jest.spyOn(userService, 'getUserCredentials').mockImplementationOnce(
       async (): Promise<AuthenticatedUser> =>
         (request.user = {
           username: 'username',
@@ -64,7 +64,7 @@ describe('Auth middleware', () => {
       },
     };
 
-    jest.spyOn(userService, 'validate').mockImplementationOnce(
+    jest.spyOn(userService, 'getUserCredentials').mockImplementationOnce(
       async (): Promise<AuthenticatedUser> =>
         (request.user = {
           username: 'username',
@@ -90,7 +90,7 @@ describe('Auth middleware', () => {
       },
     };
 
-    jest.spyOn(userService, 'validate').mockImplementationOnce(
+    jest.spyOn(userService, 'getUserCredentials').mockImplementationOnce(
       async (): Promise<AuthenticatedUser> =>
         (request.user = {
           username: 'username',
@@ -117,7 +117,7 @@ describe('Auth middleware', () => {
     };
 
     jest
-      .spyOn(userService, 'validate')
+      .spyOn(userService, 'getUserCredentials')
       .mockImplementationOnce(async (): Promise<any> => new Error());
 
     try {

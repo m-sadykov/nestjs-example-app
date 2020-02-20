@@ -11,7 +11,7 @@ describe('Users Controller', () => {
     getAll: jest.fn(),
     removeUser: jest.fn(),
     updateUser: jest.fn(),
-    validate: jest.fn(),
+    getUserCredentials: jest.fn(),
   };
 
   beforeAll(async () => {
