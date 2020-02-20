@@ -21,8 +21,13 @@ export function authenticate(usersService: IUsersService): Authenticate {
     }
 
     const [username, password] = await getAuthorizationCredentials(authHeaders);
+    const user = await usersService.getUserCredentials(username, password);
 
-    req.user = await usersService.validate(username, password);
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+
+    req.user = user;
 
     next();
   };

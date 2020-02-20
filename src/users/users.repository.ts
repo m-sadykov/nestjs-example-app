@@ -1,15 +1,10 @@
 import { UserForCreate, User, UserForUpdate } from './models/user.model';
 import { UserDocument } from './schema/user.schema';
 import { Model } from 'mongoose';
-
-type QueryParams = {
-  username?: string;
-  password?: string;
-  isDeleted?: boolean;
-};
+import { QueryParams } from './users.service';
 
 export interface IUsersRepository {
-  create(role: UserForCreate): Promise<User>;
+  create(user: UserForCreate): Promise<User>;
 
   getAll(query?: QueryParams): Promise<User[]>;
 
@@ -87,9 +82,7 @@ export class UsersRepository implements IUsersRepository {
       throw new Error(`User with ${id} not found`);
     }
 
-    const deleted = await this.database.findByIdAndUpdate(id, {
-      isDeleted: true,
-    });
+    const deleted = await this.database.findByIdAndUpdate(id, { isDeleted: true }, { new: true });
 
     return this.mapper.fromEntity(deleted);
   }

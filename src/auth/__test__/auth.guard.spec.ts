@@ -17,7 +17,7 @@ describe('Auth Guard', () => {
     getHandler: jest.fn(),
     switchToHttp: jest.fn(),
   };
-  const roles: string[] = ['admin', 'reader', 'writer'];
+  const roles = ['admin', 'reader', 'writer'];
 
   let mockGetHandler = jest.fn();
 

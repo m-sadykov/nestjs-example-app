@@ -13,8 +13,14 @@ import { RoleForCreate } from '../roles/models/role.model';
 import { IUserRoleRelService } from '../user-role-rel/user-role-rel.service';
 import { ROLES_SERVICE, USER_ROLE_RELATION_SERVICE } from '../constants';
 
+export type QueryParams = {
+  username?: string;
+  password?: string;
+  isDeleted?: boolean;
+};
+
 export interface IUsersService {
-  validate(username: string, password: string): Promise<AuthenticatedUser>;
+  getUserCredentials(username: string, password: string): Promise<AuthenticatedUser | undefined>;
 
   getAll(): Promise<User[]>;
 
@@ -55,7 +61,10 @@ export class UsersService implements IUsersService, OnModuleInit {
     return;
   }
 
-  async validate(username: string, password: string): Promise<AuthenticatedUser> {
+  async getUserCredentials(
+    username: string,
+    password: string,
+  ): Promise<AuthenticatedUser | undefined> {
     const query = { username, password };
     const [user] = await this.usersRepo.getAll(query);
 
@@ -67,9 +76,9 @@ export class UsersService implements IUsersService, OnModuleInit {
         username: user.username,
         roles: [role.name],
       };
-    } else {
-      throw new UnauthorizedException();
     }
+
+    return undefined;
   }
 
   private async isUserAlreadyExists(username: string): Promise<boolean> {

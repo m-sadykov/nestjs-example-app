@@ -1,43 +1,29 @@
-import { NestFactory, Reflector } from '@nestjs/core';
-import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { LoggingInterceptor } from './logging.interceptor';
-import { Logger, createLogger, transports, format } from 'winston';
+import { createLogger, format, Logger, transports } from 'winston';
+import { AppModule } from './app.module';
 import { AuthGuard } from './auth/auth.guard';
-import { UsersService } from './users/users.service';
-import { UsersRepository, UsersMapper } from './users/users.repository';
-import * as mongoose from 'mongoose';
-import { UserSchema, UserDocument } from './users/schema/user.schema';
-import { RolesService } from './roles/roles.service';
-import { RolesRepository, RolesMapper } from './roles/roles.repository';
-import { RoleSchema, RoleDocument } from './roles/schema/role.schema';
-import { UserRoleRelService, UserRoleRelationMapper } from './user-role-rel/user-role-rel.service';
-import {
-  UserRoleRelSchema,
-  UserRoleRelDocument,
-} from './user-role-rel/schema/user-role-rel.schema';
-import { USER_MODEL, ROLE_MODEL, USER_ROLE_RELATION_MODEL } from './constants';
 import { authenticate as _authenticate } from './auth/auth.middleware';
-
-const connection = mongoose.connection;
+import { LoggingInterceptor } from './logging.interceptor';
+import { RolesMapper, RolesRepository } from './roles/roles.repository';
+import { RolesService } from './roles/roles.service';
+import { rolesModel } from './roles/schema/role.schema';
+import { userRoleRelModel } from './user-role-rel/schema/user-role-rel.schema';
+import { UserRoleRelationMapper, UserRoleRelService } from './user-role-rel/user-role-rel.service';
+import { usersModel } from './users/schema/user.schema';
+import { UsersMapper, UsersRepository } from './users/users.repository';
+import { UsersService } from './users/users.service';
 
 async function bootstrap() {
   const mapper = new UserRoleRelationMapper();
-  const userRoleRelModel = connection.model<UserRoleRelDocument>(
-    USER_ROLE_RELATION_MODEL,
-    UserRoleRelSchema,
-    'identity-role-relations',
-  );
   const userRoleRelService = new UserRoleRelService(userRoleRelModel, mapper);
 
   const rolesMapper = new RolesMapper();
-  const rolesModel = connection.model<RoleDocument>(ROLE_MODEL, RoleSchema, 'identity-roles');
   const rolesRepository = new RolesRepository(rolesModel, rolesMapper);
   const rolesService = new RolesService(rolesRepository);
 
   const usersMapper = new UsersMapper();
-  const usersModel = connection.model<UserDocument>(USER_MODEL, UserSchema, 'identity-users');
   const usersRepository = new UsersRepository(usersModel, usersMapper);
   const usersService = new UsersService(usersRepository, rolesService, userRoleRelService);
 

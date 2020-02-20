@@ -1,5 +1,6 @@
-import { Schema, Document } from 'mongoose';
+import { Schema, Document, connection } from 'mongoose';
 import { ObjectId } from '../../common';
+import { USER_ROLE_RELATION_MODEL } from '../../constants';
 
 export interface UserRoleRelDocument extends Document {
   readonly id: ObjectId;
@@ -12,3 +13,9 @@ export const UserRoleRelSchema: Schema = new Schema({
   roleId: { type: String, required: true },
   isDeleted: { type: Boolean, default: false },
 });
+
+export const userRoleRelModel = connection.model<UserRoleRelDocument>(
+  USER_ROLE_RELATION_MODEL,
+  UserRoleRelSchema,
+  'identity-role-relations',
+);

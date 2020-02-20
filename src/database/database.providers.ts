@@ -11,6 +11,7 @@ export const databaseProviders = [
         useNewUrlParser: true,
         useUnifiedTopology: true,
         useCreateIndex: true,
+        useFindAndModify: false,
       };
 
       return mongoose.connect(MONGO_URL, options);
