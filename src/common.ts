@@ -6,6 +6,7 @@ import { Role } from './roles/models/role.model';
 import { UserRoleRelation } from './user-role-rel/models/user-role-rel.model';
 
 export type ObjectId = mongoose.Schema.Types.ObjectId;
+export const objectId = mongoose.Schema.Types.ObjectId;
 
 // testing
 const mongoServer = new MongoMemoryServer();

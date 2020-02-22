@@ -11,7 +11,7 @@ describe('Users repository', () => {
   const mapper = new UsersMapper();
 
   let repository: UsersRepository;
-  let mockUsers: User[] = [];
+  let mockUsers: User[];
 
   beforeAll(async () => {
     await establishDbConnection();
@@ -35,7 +35,6 @@ describe('Users repository', () => {
     const createdUser = await repository.create(user);
 
     expect(createdUser.id).toBeDefined();
-    expect(createdUser.isDeleted).toBeFalsy();
     expect(createdUser.username).toBe(user.username);
     expect(createdUser.password).toBe(user.password);
   });

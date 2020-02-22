@@ -93,9 +93,7 @@ export class RolesRepository implements IRolesRepository {
       throw new Error(`Role with ${id} not found`);
     }
 
-    const deleted = await this.database.findByIdAndUpdate(id, {
-      isDeleted: true,
-    });
+    const deleted = await this.database.findByIdAndUpdate(id, { isDeleted: true }, { new: true });
 
     return this.mapper.fromEntity(deleted);
   }
