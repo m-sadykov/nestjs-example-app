@@ -21,7 +21,7 @@ export class UserRoleRelationMapper implements IUserRoleRelationMapper {
 export interface IUserRoleRelService {
   getAll(): Promise<UserRoleRelation[]>;
 
-  getByAccount(accountId: string): Promise<UserRoleRelation[]>;
+  getByAccount(userId: string): Promise<UserRoleRelation[]>;
 
   create(relation: UserRoleRelationForCreate): Promise<UserRoleRelation>;
 
@@ -60,13 +60,15 @@ export class UserRoleRelService implements IUserRoleRelService {
   async delete(id: string): Promise<UserRoleRelation> {
     const userRoleRel = await this.relationModel.findById(id);
 
-    if (userRoleRel) {
+    if (!userRoleRel) {
       throw new Error(`Relation ${id} not found`);
     }
 
-    const deleted = await this.relationModel.findByIdAndUpdate(id, {
-      isDeleted: true,
-    });
+    const deleted = await this.relationModel.findByIdAndUpdate(
+      id,
+      { isDeleted: true },
+      { new: true },
+    );
 
     return this.mapper.fromEntity(deleted);
   }

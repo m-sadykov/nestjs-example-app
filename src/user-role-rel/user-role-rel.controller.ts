@@ -21,13 +21,13 @@ export class UserRoleRelController {
     return this.userRoleRelService.getAll();
   }
 
-  @Get(':accountId')
+  @Get(':userId')
   @Roles(['admin', 'writer'])
   @ApiResponse({ status: 200, type: UserRoleRelPresentationDto })
-  async getUserRoleRelByAccountId(
-    @Param('accountId') accountId: string,
+  async getUserRoleRelByUserId(
+    @Param('userId') userId: string,
   ): Promise<UserRoleRelPresentationDto[]> {
-    return this.userRoleRelService.getByAccount(accountId);
+    return this.userRoleRelService.getByAccount(userId);
   }
 
   @Delete(':id')

@@ -1,82 +1,55 @@
-import 'reflect-metadata';
 import { UserRoleRelation } from '../models/user-role-rel.model';
 import { UserRoleRelController } from '../user-role-rel.controller';
-import { IUserRoleRelService } from '../user-role-rel.service';
+import { UserRoleRelService, UserRoleRelationMapper } from '../user-role-rel.service';
+import { userRoleRelModel } from '../schema/user-role-rel.schema';
+import { establishDbConnection, closeDbConnection, sample } from '../../common';
+import { getMockUserRoleRelations } from './mock.data';
 
 describe('UserRolRel Controller', () => {
   let userRoleRelController: UserRoleRelController;
-
-  const userRoleRelService: IUserRoleRelService = {
-    create: jest.fn(),
-    delete: jest.fn(),
-    getAll: jest.fn(),
-    getByAccount: jest.fn(),
-  };
-
-  const relationsRepo = {
-    find: jest.fn(),
-    findById: jest.fn(),
-    findByIdAndUpdate: jest.fn(),
-  };
+  let mockRelations: UserRoleRelation[];
 
   beforeEach(async () => {
+    const mapper = new UserRoleRelationMapper();
+    const userRoleRelService = new UserRoleRelService(userRoleRelModel, mapper);
+
     userRoleRelController = new UserRoleRelController(userRoleRelService);
+  });
+
+  beforeAll(async () => {
+    await establishDbConnection();
+    mockRelations = await getMockUserRoleRelations();
+  });
+
+  afterAll(async () => {
+    await closeDbConnection();
   });
 
   describe('getAll', () => {
     it('should return list of user role relations', async () => {
-      const mockRelation = getMockRelation();
-
-      jest
-        .spyOn(userRoleRelService, 'getAll')
-        .mockImplementationOnce(async (): Promise<UserRoleRelation[]> => [mockRelation]);
-
       const relations = await userRoleRelController.getAll();
-      expect(Array.isArray(relations)).toBe(true);
+
+      expect(relations.length).toBeGreaterThan(0);
     });
   });
 
-  describe('getUserRoleRelByAccountId', () => {
+  describe('getUserRoleRelByUserId', () => {
     it('should return relation by account id', async () => {
-      const accountId = 'some_id';
-      const mockRelation = getMockRelation();
+      const userId = sample(mockRelations).userId;
 
-      jest
-        .spyOn(userRoleRelService, 'getByAccount')
-        .mockImplementationOnce(async (): Promise<UserRoleRelation[]> => [mockRelation]);
+      const relations = await userRoleRelController.getUserRoleRelByUserId(userId);
 
-      const relation = await userRoleRelController.getUserRoleRelByAccountId(accountId);
-      expect(Array.isArray(relation)).toBe(true);
+      expect(relations.length).toBeGreaterThan(0);
+      expect(relations.every(Boolean)).toBe(true);
     });
   });
 
   describe('removeRel', () => {
     it('should remove relation by id', async () => {
-      const id = 'some_id';
-      const relForDelete: UserRoleRelation = {
-        ...getMockRelation(),
-        isDeleted: true,
-      };
-
-      relationsRepo.findById.mockImplementationOnce(() => undefined);
-
-      jest.spyOn(userRoleRelService, 'delete').mockImplementationOnce(
-        async (): Promise<UserRoleRelation> => {
-          return Promise.resolve(relForDelete);
-        },
-      );
+      const id = sample(mockRelations).id;
 
       const deletedRel = await userRoleRelController.removeRel(id);
       expect(deletedRel.isDeleted).toBe(true);
     });
   });
-
-  const getMockRelation = (): UserRoleRelation => {
-    return {
-      id: 'id',
-      userId: 'some_id',
-      roleId: 'some_other_id',
-      isDeleted: false,
-    };
-  };
 });
