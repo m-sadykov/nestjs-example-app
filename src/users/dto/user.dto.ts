@@ -17,17 +17,23 @@ export class UpdateUserDto {
   @IsString()
   @IsOptional()
   @ApiModelPropertyOptional()
-  readonly username: string;
+  readonly username?: string;
 
   @IsString()
   @IsOptional()
   @ApiModelPropertyOptional()
-  readonly password: string;
+  readonly password?: string;
 }
 
 export class UserPresentationDto {
   @ApiModelProperty()
+  id: string;
+
+  @ApiModelProperty()
   username: string;
+
+  @ApiModelProperty()
+  password: string;
 
   @ApiModelProperty()
   isDeleted: boolean;

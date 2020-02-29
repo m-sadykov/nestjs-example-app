@@ -1,113 +1,97 @@
-import 'reflect-metadata';
 import { UsersController } from '../users.controller';
-import { IUsersService } from '../users.service';
+import { UsersService } from '../users.service';
+import { UsersRepository, UsersMapper } from '../users.repository';
+import { usersModel } from '../schema/user.schema';
+import {
+  UserRoleRelService,
+  UserRoleRelationMapper,
+} from '../../user-role-rel/user-role-rel.service';
+import { userRoleRelModel } from '../../user-role-rel/schema/user-role-rel.schema';
+import { RolesService } from '../../roles/roles.service';
+import { RolesRepository, RolesMapper } from '../../roles/roles.repository';
+import { rolesModel } from '../../roles/schema/role.schema';
+import { UserForUpdate, User } from '../models/user.model';
+import { establishDbConnection, closeDbConnection, sample } from '../../common';
+import { getMockUsers } from './mock.data';
 
 describe('Users Controller', () => {
   let usersController: UsersController;
-
-  const usersService: IUsersService = {
-    addUser: jest.fn(),
-    findOne: jest.fn(),
-    getAll: jest.fn(),
-    removeUser: jest.fn(),
-    updateUser: jest.fn(),
-    getUserCredentials: jest.fn(),
-  };
+  let mockUsers: User[];
 
   beforeAll(async () => {
+    const rolesMapper = new RolesMapper();
+    const rolesRepo = new RolesRepository(rolesModel, rolesMapper);
+    const rolesService = new RolesService(rolesRepo);
+
+    const roleRelMapper = new UserRoleRelationMapper();
+    const userRoleRelService = new UserRoleRelService(userRoleRelModel, roleRelMapper);
+
+    const usersMapper = new UsersMapper();
+    const usersRepo = new UsersRepository(usersModel, usersMapper);
+    const usersService = new UsersService(usersRepo, rolesService, userRoleRelService);
+
     usersController = new UsersController(usersService);
+  });
+
+  beforeAll(async () => {
+    await establishDbConnection();
+    mockUsers = await getMockUsers();
+  });
+
+  afterAll(async () => {
+    await closeDbConnection();
   });
 
   describe('getAll', () => {
     it('should return list of users', async () => {
-      const mockUser = getMockUser();
-
-      jest.spyOn(usersService, 'getAll').mockImplementationOnce((): any => [mockUser]);
-
       const users = await usersController.getAll();
-      expect(Array.isArray(users)).toBe(true);
+      expect(users.length).toBeGreaterThan(0);
     });
   });
 
   describe('findOne', () => {
     it('should return user by id', async () => {
-      const id = 'some_id';
-      const mockUser = getMockUser();
-
-      jest.spyOn(usersService, 'findOne').mockImplementationOnce((): any => mockUser);
+      const id = sample(mockUsers).id;
 
       const user = await usersController.findOne(id);
-      expect(user).toBe(mockUser);
+      expect(user.id).toBe(id);
     });
   });
 
   describe('createUser', () => {
     it('should create new user', async () => {
-      const mockUser = getMockUser();
+      const mockUser = {
+        username: 'user_name',
+        password: 'password_123',
+      };
+      const roleId = 'role_id';
 
-      jest.spyOn(usersService, 'addUser').mockImplementationOnce((): any => mockUser);
-
-      const createdUser = await usersController.createUser(mockUser);
-      expect(createdUser).toBe(mockUser);
-    });
-
-    it('should return BadRequest Exception if user is already exists', async () => {
-      const mockUser = getMockUser();
-
-      jest.spyOn(usersService, 'addUser').mockImplementationOnce(
-        (): any => {
-          return {
-            statusCode: 400,
-          };
-        },
-      );
-
-      try {
-        await usersController.createUser(mockUser);
-      } catch (error) {
-        expect(error.status).toBe(400);
-        expect(error.response).toMatchObject({
-          statusCode: 400,
-          error: 'Bad Request',
-          message: `User ${mockUser.username} already exists`,
-        });
-      }
+      const createdUser = await usersController.createUser(mockUser, roleId);
+      expect(createdUser.username).toBe(mockUser.username);
+      expect(createdUser.password).toBe(mockUser.password);
     });
   });
 
   describe('updateUser', () => {
     it('should update user by id', async () => {
-      const id = 'some_id';
-      const user = getMockUser();
+      const id = sample(mockUsers).id;
+      const patch: UserForUpdate = {
+        password: 'pwd',
+      };
 
-      jest.spyOn(usersService, 'updateUser').mockImplementationOnce((): any => user);
+      const updatedUser = await usersController.updateUser(id, patch);
 
-      const updatedUser = await usersController.updateUser(id, user);
-      expect(updatedUser).toBe(user);
+      expect(updatedUser.id).toBe(id);
+      expect(updatedUser.password).toBe(patch.password);
     });
   });
 
   describe('removeUser', () => {
     it('should remove user by id', async () => {
-      const id = 'some_id';
-
-      jest.spyOn(usersService, 'removeUser').mockImplementationOnce(
-        (): any => {
-          return {
-            isDeleted: true,
-          };
-        },
-      );
+      const id = sample(mockUsers).id;
 
       const deletedUser = await usersController.removeUser(id);
       expect(deletedUser.isDeleted).toBe(true);
     });
   });
-
-  const getMockUser = () => {
-    return {
-      username: 'user_name',
-      password: 'password_123',
-    };
-  };
 });

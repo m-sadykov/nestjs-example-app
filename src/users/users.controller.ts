@@ -35,8 +35,11 @@ export class UsersController {
     type: UserPresentationDto,
     description: 'User has been successfully created.',
   })
-  async createUser(@Body() createUserDto: CreateUserDto): Promise<UserPresentationDto> {
-    return this.usersService.addUser(createUserDto);
+  async createUser(
+    @Body() createUserDto: CreateUserDto,
+    @Param() roleId: string,
+  ): Promise<UserPresentationDto> {
+    return this.usersService.addUser(createUserDto, roleId);
   }
 
   @Patch(':id')

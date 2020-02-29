@@ -25,7 +25,7 @@ export interface IUsersService {
 
   findOne(id: string): Promise<User>;
 
-  addUser(user: UserForCreate): Promise<User>;
+  addUser(user: UserForCreate, roleId: string): Promise<User>;
 
   updateUser(id: string, patch: UserForUpdate): Promise<User>;
 
@@ -119,7 +119,7 @@ export class UsersService implements IUsersService, OnModuleInit {
     return this.usersRepo.findOne(id);
   }
 
-  async addUser(user: UserForCreate): Promise<User> {
+  async addUser(user: UserForCreate, roleId: string): Promise<User> {
     const { username } = user;
     const isUserExists = await this.isUserAlreadyExists(username);
 
@@ -127,7 +127,10 @@ export class UsersService implements IUsersService, OnModuleInit {
       throw new BadRequestException(`User ${username} already exists`);
     }
 
-    return this.usersRepo.create(user);
+    const createdUser = await this.usersRepo.create(user);
+    await this.userRoleRelService.create({ userId: createdUser.id, roleId });
+
+    return createdUser;
   }
 
   async updateUser(id: string, patch: UserForUpdate): Promise<User> {
