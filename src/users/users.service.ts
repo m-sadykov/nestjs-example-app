@@ -7,8 +7,7 @@ import {
 } from '@nestjs/common';
 import { AuthenticatedUser, UserForCreate, User, UserForUpdate } from './models/user.model';
 import { IUsersRepository } from './users.repository';
-import { IRolesService } from '../roles/roles.service';
-import { RoleForCreate } from '../roles/models/role.model';
+import { IRolesService, RoleForCreate } from '../roles';
 import { IUserRoleRelService } from '../user-role-rel/user-role-rel.service';
 import { ROLES_SERVICE, USER_ROLE_RELATION_SERVICE } from '../constants';
 
@@ -60,6 +59,7 @@ export class UsersService implements IUsersService, OnModuleInit {
     return;
   }
 
+  // TODO: provide proper error handling
   async getUserCredentials(
     username: string,
     password: string,
@@ -69,7 +69,8 @@ export class UsersService implements IUsersService, OnModuleInit {
 
     if (user) {
       const [userRoleRel] = await this.userRoleRelService.getByAccount(user.id);
-      const role = await this.rolesService.findOne(userRoleRel.roleId);
+      const result = await this.rolesService.findOne(userRoleRel.roleId);
+      const role = result.right();
 
       return {
         username: user.username,
@@ -91,6 +92,7 @@ export class UsersService implements IUsersService, OnModuleInit {
     return false;
   }
 
+  // TODO: provide proper error handling
   private async createAdminUser(user: UserForCreate) {
     const role: RoleForCreate = {
       name: 'admin',
@@ -99,7 +101,8 @@ export class UsersService implements IUsersService, OnModuleInit {
     };
 
     const createdUser = await this.usersRepo.create(user);
-    const createdRole = await this.rolesService.create(role);
+    const result = await this.rolesService.create(role);
+    const createdRole = result.right();
 
     const relation = {
       userId: createdUser.id,

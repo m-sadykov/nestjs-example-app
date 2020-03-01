@@ -1,7 +1,7 @@
 import { Module, DynamicModule, Inject, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { UsersController } from './users.controller';
 import { IUsersService } from './users.service';
-import { IRolesService } from '../roles/roles.service';
+import { IRolesService } from '../roles/';
 import { IUserRoleRelService } from '../user-role-rel/user-role-rel.service';
 import {
   ROLES_SERVICE,

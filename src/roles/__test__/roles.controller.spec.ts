@@ -1,6 +1,6 @@
 import { Role, RoleForCreate, RoleForUpdate } from '../models/role.model';
 import { RolesController } from '../roles.controller';
-import { RolesService, IRolesService } from '../roles.service';
+import { RolesService } from '../roles.service';
 import { RolesRepository, RolesMapper } from '../roles.repository';
 import { rolesModel } from '../schema/role.schema';
 import { establishDbConnection, closeDbConnection, sample } from '../../common';
@@ -8,7 +8,7 @@ import { getMockRoles } from './mock.data';
 
 describe('Roles Controller', () => {
   let rolesController: RolesController;
-  let rolesService: IRolesService;
+  let rolesService: RolesService;
   let mockRoles: Role[];
 
   beforeAll(async () => {

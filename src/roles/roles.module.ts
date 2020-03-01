@@ -1,6 +1,6 @@
 import { Module, DynamicModule, NestModule, MiddlewareConsumer, Inject } from '@nestjs/common';
 import { RolesController } from './roles.controller';
-import { IRolesService } from './roles.service';
+import { IRolesService } from './interface/interface';
 import { ROLES_SERVICE, AUTHENTICATE } from '../constants';
 import { Authenticate } from '../auth/auth.middleware';
 

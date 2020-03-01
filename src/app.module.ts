@@ -1,10 +1,9 @@
 import { Module, DynamicModule } from '@nestjs/common';
 import { ConfigModule } from './config/config.module';
-import { RolesModule } from './roles/roles.module';
 import { UsersModule } from './users/users.module';
 import { UserRoleRelModule } from './user-role-rel/user-role-rel.module';
 import { IUsersService } from './users/users.service';
-import { IRolesService } from './roles/roles.service';
+import { IRolesService, RolesModule } from './roles';
 import { IUserRoleRelService } from './user-role-rel/user-role-rel.service';
 import { Authenticate } from './auth/auth.middleware';
 import { DatabaseModule } from './database/database.module';

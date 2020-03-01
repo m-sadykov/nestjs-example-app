@@ -1,9 +1,22 @@
-import { Controller, Get, Param, Post, Body, Patch, Delete, Inject } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  Post,
+  Body,
+  Patch,
+  Delete,
+  Inject,
+  NotFoundException,
+  BadRequestException,
+  HttpStatus,
+} from '@nestjs/common';
 import { CreateRoleDto, UpdateRoleDto, RolePresentationDto } from './dto/role.dto';
 import { ApiTags, ApiResponse, ApiBasicAuth } from '@nestjs/swagger';
 import { Roles } from '../auth/auth.roles.decorator';
-import { IRolesService } from './roles.service';
+import { IRolesService } from './interface/interface';
 import { ROLES_SERVICE } from '../constants';
+import { identity } from 'rxjs';
 
 @ApiBasicAuth()
 @ApiTags('roles')
@@ -25,7 +38,15 @@ export class RolesController {
   @Roles(['admin', 'writer'])
   @ApiResponse({ status: 200, type: RolePresentationDto })
   async findOne(@Param('id') id: string): Promise<RolePresentationDto> {
-    return this.rolesService.findOne(id);
+    const result = await this.rolesService.findOne(id);
+
+    return result.cata(error => {
+      throw new NotFoundException({
+        status: HttpStatus.NOT_FOUND,
+        error: error.name,
+        message: error.message,
+      });
+    }, identity);
   }
 
   @Post()
@@ -36,7 +57,15 @@ export class RolesController {
     description: 'Role has been successfully created.',
   })
   async createRole(@Body() createRoleDto: CreateRoleDto): Promise<RolePresentationDto> {
-    return this.rolesService.create(createRoleDto);
+    const result = await this.rolesService.create(createRoleDto);
+
+    return result.cata(error => {
+      throw new BadRequestException({
+        status: HttpStatus.BAD_REQUEST,
+        error: error.name,
+        message: error.message,
+      });
+    }, identity);
   }
 
   @Patch(':id')
@@ -50,7 +79,15 @@ export class RolesController {
     @Param('id') id: string,
     @Body() updateRoleDto: UpdateRoleDto,
   ): Promise<RolePresentationDto> {
-    return this.rolesService.update(id, updateRoleDto);
+    const result = await this.rolesService.update(id, updateRoleDto);
+
+    return result.cata(error => {
+      throw new NotFoundException({
+        status: HttpStatus.NOT_FOUND,
+        error: error.name,
+        message: error.message,
+      });
+    }, identity);
   }
 
   @Delete(':id')
@@ -60,6 +97,14 @@ export class RolesController {
     description: 'Role has bee successfully removed',
   })
   async removeRole(@Param('id') id: string): Promise<RolePresentationDto> {
-    return this.rolesService.delete(id);
+    const result = await this.rolesService.delete(id);
+
+    return result.cata(error => {
+      throw new NotFoundException({
+        status: HttpStatus.NOT_FOUND,
+        error: error.name,
+        message: error.message,
+      });
+    }, identity);
   }
 }
