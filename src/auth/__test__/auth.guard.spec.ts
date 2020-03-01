@@ -19,7 +19,7 @@ describe('Auth Guard', () => {
   };
   const roles = ['admin', 'reader', 'writer'];
 
-  let mockGetHandler = jest.fn();
+  let mockReflectorSpy: any = jest.fn();
 
   async function mockAuthenticateUserImplementationOnce(mockUser: any) {
     const request: AuthenticatedRequest = {
@@ -28,7 +28,7 @@ describe('Auth Guard', () => {
       },
     };
 
-    mockGetHandler = jest.spyOn(reflector, 'get').mockReturnValueOnce(roles);
+    mockReflectorSpy = jest.spyOn(reflector, 'get').mockReturnValueOnce(roles);
 
     context.switchToHttp.mockImplementationOnce(() => {
       return {
@@ -51,7 +51,7 @@ describe('Auth Guard', () => {
     const canActivate = authGuard.canActivate(context as any);
 
     expect(canActivate).toBe(true);
-    mockGetHandler.mockReset();
+    mockReflectorSpy.mockReset();
   });
 
   it('should return false if user has no roles assigned', async () => {
@@ -64,7 +64,7 @@ describe('Auth Guard', () => {
     const canActivate = authGuard.canActivate(context as any);
 
     expect(canActivate).toBe(false);
-    mockGetHandler.mockReset();
+    mockReflectorSpy.mockReset();
   });
 
   it('should return false if user has invalid roles assigned', async () => {
@@ -77,6 +77,6 @@ describe('Auth Guard', () => {
     const canActivate = authGuard.canActivate(context as any);
 
     expect(canActivate).toBe(false);
-    mockGetHandler.mockReset();
+    mockReflectorSpy.mockReset();
   });
 });

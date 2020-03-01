@@ -1,12 +1,12 @@
 import { Controller, Get, Param, Post, Body, Patch, Delete, Inject } from '@nestjs/common';
 import { CreateRoleDto, UpdateRoleDto, RolePresentationDto } from './dto/role.dto';
-import { ApiUseTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiResponse, ApiBasicAuth } from '@nestjs/swagger';
 import { Roles } from '../auth/auth.roles.decorator';
 import { IRolesService } from './roles.service';
 import { ROLES_SERVICE } from '../constants';
 
-@ApiBearerAuth()
-@ApiUseTags('roles')
+@ApiBasicAuth()
+@ApiTags('roles')
 @Controller('roles')
 export class RolesController {
   constructor(

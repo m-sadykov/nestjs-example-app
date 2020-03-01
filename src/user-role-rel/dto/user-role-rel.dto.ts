@@ -1,15 +1,15 @@
-import { ApiModelProperty } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class UserRoleRelPresentationDto {
-  @ApiModelProperty()
+  @ApiProperty()
   id: string;
 
-  @ApiModelProperty()
+  @ApiProperty()
   userId: string;
 
-  @ApiModelProperty()
+  @ApiProperty()
   roleId: string;
 
-  @ApiModelProperty()
+  @ApiProperty()
   isDeleted: boolean;
 }

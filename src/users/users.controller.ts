@@ -1,12 +1,12 @@
 import { Controller, Get, Post, Param, Body, Patch, Delete, Inject } from '@nestjs/common';
-import { ApiUseTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiResponse, ApiBasicAuth } from '@nestjs/swagger';
 import { CreateUserDto, UpdateUserDto, UserPresentationDto } from './dto/user.dto';
 import { Roles } from '../auth/auth.roles.decorator';
 import { IUsersService } from './users.service';
 import { USERS_SERVICE } from '../constants';
 
-@ApiBearerAuth()
-@ApiUseTags('users')
+@ApiBasicAuth()
+@ApiTags('users')
 @Controller('users')
 export class UsersController {
   constructor(

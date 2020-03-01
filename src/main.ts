@@ -50,7 +50,7 @@ async function bootstrap() {
     .setTitle('Nest.js example app')
     .setDescription('Use auto generated admin user credentials to authenticate into swagger')
     .setVersion('1.0')
-    .addBearerAuth('Authorization', 'header', 'basic')
+    .addBasicAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, options);

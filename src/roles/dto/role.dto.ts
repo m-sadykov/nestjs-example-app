@@ -1,53 +1,53 @@
 import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
-import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateRoleDto {
   @IsString()
   @IsNotEmpty()
-  @ApiModelProperty()
+  @ApiProperty()
   readonly name: string;
 
   @IsString()
   @IsNotEmpty()
-  @ApiModelProperty()
+  @ApiProperty()
   readonly displayName: string;
 
   @IsString()
   @IsNotEmpty()
-  @ApiModelProperty()
+  @ApiProperty()
   readonly description: string;
 }
 
 export class UpdateRoleDto {
   @IsString()
   @IsOptional()
-  @ApiModelPropertyOptional()
+  @ApiPropertyOptional()
   readonly name?: string;
 
   @IsString()
   @IsOptional()
-  @ApiModelPropertyOptional()
+  @ApiPropertyOptional()
   readonly displayName?: string;
 
   @IsString()
   @IsOptional()
-  @ApiModelPropertyOptional()
+  @ApiPropertyOptional()
   readonly description?: string;
 }
 
 export class RolePresentationDto {
-  @ApiModelProperty()
+  @ApiProperty()
   id: string;
 
-  @ApiModelProperty()
+  @ApiProperty()
   name: string;
 
-  @ApiModelProperty()
+  @ApiProperty()
   displayName: string;
 
-  @ApiModelProperty()
+  @ApiProperty()
   description: string;
 
-  @ApiModelProperty()
+  @ApiProperty()
   isDeleted: boolean;
 }

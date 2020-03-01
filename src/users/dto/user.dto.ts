@@ -1,40 +1,40 @@
 import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
-import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateUserDto {
   @IsString()
   @IsNotEmpty()
-  @ApiModelProperty()
+  @ApiProperty()
   readonly username: string;
 
   @IsString()
   @IsNotEmpty()
-  @ApiModelProperty()
+  @ApiProperty()
   readonly password: string;
 }
 
 export class UpdateUserDto {
   @IsString()
   @IsOptional()
-  @ApiModelPropertyOptional()
+  @ApiPropertyOptional()
   readonly username?: string;
 
   @IsString()
   @IsOptional()
-  @ApiModelPropertyOptional()
+  @ApiPropertyOptional()
   readonly password?: string;
 }
 
 export class UserPresentationDto {
-  @ApiModelProperty()
+  @ApiProperty()
   id: string;
 
-  @ApiModelProperty()
+  @ApiProperty()
   username: string;
 
-  @ApiModelProperty()
+  @ApiProperty()
   password: string;
 
-  @ApiModelProperty()
+  @ApiProperty()
   isDeleted: boolean;
 }

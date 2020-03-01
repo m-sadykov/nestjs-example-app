@@ -1,12 +1,12 @@
 import { Controller, Get, Param, Delete, Inject } from '@nestjs/common';
-import { ApiUseTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiResponse, ApiBasicAuth } from '@nestjs/swagger';
 import { UserRoleRelPresentationDto } from './dto/user-role-rel.dto';
 import { Roles } from '../auth/auth.roles.decorator';
 import { IUserRoleRelService } from './user-role-rel.service';
 import { USER_ROLE_RELATION_SERVICE } from '../constants';
 
-@ApiBearerAuth()
-@ApiUseTags('user-role-rel')
+@ApiBasicAuth()
+@ApiTags('user-role-rel')
 @Controller('user-role-rel')
 export class UserRoleRelController {
   constructor(
