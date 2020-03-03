@@ -12,11 +12,21 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { CreateRoleDto, UpdateRoleDto, RolePresentationDto } from './dto/role.dto';
-import { ApiTags, ApiResponse, ApiBasicAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiResponse,
+  ApiBasicAuth,
+  ApiOperation,
+  ApiParam,
+  ApiForbiddenResponse,
+  ApiNotFoundResponse,
+  ApiConflictResponse,
+} from '@nestjs/swagger';
 import { Roles } from '../auth/auth.roles.decorator';
 import { IRolesService } from './interface/interface';
 import { ROLES_SERVICE } from '../constants';
 import { identity } from 'rxjs';
+import { RoleNotFoundError, RoleAlreadyExistsError } from './errors/errors';
 
 @ApiBasicAuth()
 @ApiTags('roles')
@@ -30,6 +40,12 @@ export class RolesController {
   @Get()
   @Roles(['admin', 'writer'])
   @ApiResponse({ status: 200, type: [RolePresentationDto] })
+  @ApiForbiddenResponse({ status: 403, description: 'Forbidden' })
+  @ApiConflictResponse({ status: 409, description: 'Already exists' })
+  @ApiOperation({
+    summary: 'Get roles',
+    description: 'Get all existing roles',
+  })
   async getAll(): Promise<RolePresentationDto[]> {
     return this.rolesService.getAll();
   }
@@ -37,43 +53,68 @@ export class RolesController {
   @Get(':id')
   @Roles(['admin', 'writer'])
   @ApiResponse({ status: 200, type: RolePresentationDto })
+  @ApiForbiddenResponse({ status: 403, description: 'Forbidden' })
+  @ApiNotFoundResponse({ status: 404, description: 'Not Found' })
+  @ApiParam({
+    name: 'id',
+    type: String,
+    example: 'id: 5e5eb0418aa9340f913008e5',
+  })
+  @ApiOperation({
+    summary: 'Get role',
+    description: 'Get specific role by id',
+  })
   async findOne(@Param('id') id: string): Promise<RolePresentationDto> {
     const result = await this.rolesService.findOne(id);
 
     return result.cata(error => {
-      throw new NotFoundException({
-        status: HttpStatus.NOT_FOUND,
-        error: error.name,
-        message: error.message,
-      });
+      if (error instanceof RoleNotFoundError) {
+        throw new NotFoundException({
+          status: HttpStatus.NOT_FOUND,
+          error: error.name,
+          message: error.message,
+        });
+      }
+      throw error;
     }, identity);
   }
 
   @Post()
   @Roles(['admin'])
-  @ApiResponse({
-    status: 201,
-    type: RolePresentationDto,
-    description: 'Role has been successfully created.',
+  @ApiResponse({ status: 201, type: RolePresentationDto })
+  @ApiForbiddenResponse({ status: 403, description: 'Forbidden' })
+  @ApiOperation({
+    summary: 'Add new role',
+    description: 'Create new role',
   })
   async createRole(@Body() createRoleDto: CreateRoleDto): Promise<RolePresentationDto> {
     const result = await this.rolesService.create(createRoleDto);
 
     return result.cata(error => {
-      throw new BadRequestException({
-        status: HttpStatus.BAD_REQUEST,
-        error: error.name,
-        message: error.message,
-      });
+      if (error instanceof RoleAlreadyExistsError) {
+        throw new BadRequestException({
+          status: HttpStatus.BAD_REQUEST,
+          error: error.name,
+          message: error.message,
+        });
+      }
+      throw error;
     }, identity);
   }
 
   @Patch(':id')
   @Roles(['admin'])
-  @ApiResponse({
-    status: 200,
-    type: RolePresentationDto,
-    description: 'Role has been successfully updated.',
+  @ApiResponse({ status: 200, type: RolePresentationDto })
+  @ApiForbiddenResponse({ status: 403, description: 'Forbidden' })
+  @ApiNotFoundResponse({ status: 404, description: 'Not Found' })
+  @ApiParam({
+    name: 'id',
+    type: String,
+    example: 'id: 5e5eb0418aa9340f913008e5',
+  })
+  @ApiOperation({
+    summary: 'Update role',
+    description: 'Update specific role by id',
   })
   async updateRole(
     @Param('id') id: string,
@@ -82,29 +123,43 @@ export class RolesController {
     const result = await this.rolesService.update(id, updateRoleDto);
 
     return result.cata(error => {
-      throw new NotFoundException({
-        status: HttpStatus.NOT_FOUND,
-        error: error.name,
-        message: error.message,
-      });
+      if (error instanceof RoleNotFoundError) {
+        throw new NotFoundException({
+          status: HttpStatus.NOT_FOUND,
+          error: error.name,
+          message: error.message,
+        });
+      }
+      throw error;
     }, identity);
   }
 
   @Delete(':id')
   @Roles(['admin'])
-  @ApiResponse({
-    status: 200,
-    description: 'Role has bee successfully removed',
+  @ApiResponse({ status: 200, type: RolePresentationDto })
+  @ApiForbiddenResponse({ status: 403, description: 'Forbidden' })
+  @ApiNotFoundResponse({ status: 404, description: 'Not Found' })
+  @ApiParam({
+    name: 'id',
+    type: String,
+    example: 'id: 5e5eb0418aa9340f913008e5',
+  })
+  @ApiOperation({
+    summary: 'Delete role',
+    description: 'Remove specific role by id',
   })
   async removeRole(@Param('id') id: string): Promise<RolePresentationDto> {
     const result = await this.rolesService.delete(id);
 
     return result.cata(error => {
-      throw new NotFoundException({
-        status: HttpStatus.NOT_FOUND,
-        error: error.name,
-        message: error.message,
-      });
+      if (error instanceof RoleNotFoundError) {
+        throw new NotFoundException({
+          status: HttpStatus.NOT_FOUND,
+          error: error.name,
+          message: error.message,
+        });
+      }
+      throw error;
     }, identity);
   }
 }

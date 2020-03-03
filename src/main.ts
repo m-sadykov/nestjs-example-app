@@ -53,6 +53,8 @@ async function bootstrap() {
     .addBasicAuth()
     .build();
 
+  app.setGlobalPrefix('/api');
+
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('api', app, document);
 
