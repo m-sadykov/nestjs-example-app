@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { RoleForCreate, Role, RoleForUpdate } from './models/role.model';
-import { IRolesRepository, IRolesService } from './interface/interface';
+import { IRolesRepository, IRolesService } from './interfaces/interfaces';
 import { RoleNotFoundError, RoleAlreadyExistsError } from './errors/errors';
 import { Either, Left, Right } from 'monet';
 

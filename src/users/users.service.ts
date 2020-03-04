@@ -8,7 +8,7 @@ import {
 import { AuthenticatedUser, UserForCreate, User, UserForUpdate } from './models/user.model';
 import { IUsersRepository } from './users.repository';
 import { IRolesService, RoleForCreate } from '../roles';
-import { IUserRoleRelService } from '../user-role-rel/user-role-rel.service';
+import { IUserRoleRelService } from '../user-role-rel/interfaces/interfaces';
 import { ROLES_SERVICE, USER_ROLE_RELATION_SERVICE } from '../constants';
 
 export type QueryParams = {
@@ -68,7 +68,9 @@ export class UsersService implements IUsersService, OnModuleInit {
     const [user] = await this.usersRepo.getAll(query);
 
     if (user) {
-      const [userRoleRel] = await this.userRoleRelService.getByAccount(user.id);
+      const eitherGetByAccount = await this.userRoleRelService.getByAccount(user.id);
+      // TODO: implement error handling
+      const [userRoleRel] = eitherGetByAccount.right();
       const result = await this.rolesService.findOne(userRoleRel.roleId);
       const role = result.right();
 

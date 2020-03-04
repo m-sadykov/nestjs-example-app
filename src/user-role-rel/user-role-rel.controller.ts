@@ -1,9 +1,19 @@
-import { Controller, Get, Param, Delete, Inject } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  Delete,
+  Inject,
+  NotFoundException,
+  HttpStatus,
+} from '@nestjs/common';
 import { ApiTags, ApiResponse, ApiBasicAuth } from '@nestjs/swagger';
 import { UserRoleRelPresentationDto } from './dto/user-role-rel.dto';
 import { Roles } from '../auth/auth.roles.decorator';
-import { IUserRoleRelService } from './user-role-rel.service';
+import { IUserRoleRelService } from './interfaces/interfaces';
 import { USER_ROLE_RELATION_SERVICE } from '../constants';
+import { identity } from 'rxjs';
+import { RoleRelationNotFoundError, RelationNotFoundError } from './errors/errors';
 
 @ApiBasicAuth()
 @ApiTags('user-role-rel')
@@ -27,7 +37,18 @@ export class UserRoleRelController {
   async getUserRoleRelByUserId(
     @Param('userId') userId: string,
   ): Promise<UserRoleRelPresentationDto[]> {
-    return this.userRoleRelService.getByAccount(userId);
+    const result = await this.userRoleRelService.getByAccount(userId);
+
+    return result.cata(error => {
+      if (error instanceof RoleRelationNotFoundError) {
+        throw new NotFoundException({
+          status: HttpStatus.NOT_FOUND,
+          error: error.name,
+          message: error.message,
+        });
+      }
+      throw error;
+    }, identity);
   }
 
   @Delete(':id')
@@ -37,6 +58,17 @@ export class UserRoleRelController {
     description: 'User role relation has bee successfully removed',
   })
   async removeRel(@Param('id') id: string): Promise<UserRoleRelPresentationDto> {
-    return this.userRoleRelService.delete(id);
+    const result = await this.userRoleRelService.delete(id);
+
+    return result.cata(error => {
+      if (error instanceof RelationNotFoundError) {
+        throw new NotFoundException({
+          status: HttpStatus.NOT_FOUND,
+          error: error.name,
+          message: error.message,
+        });
+      }
+      throw error;
+    }, identity);
   }
 }

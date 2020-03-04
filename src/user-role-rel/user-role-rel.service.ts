@@ -2,10 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { UserRoleRelation, UserRoleRelationForCreate } from './models/user-role-rel.model';
 import { Model } from 'mongoose';
 import { UserRoleRelDocument } from './schema/user-role-rel.schema';
-
-interface IUserRoleRelationMapper {
-  fromEntity(entity: any): UserRoleRelation;
-}
+import { IUserRoleRelationMapper, IUserRoleRelService } from './interfaces/interfaces';
+import { Either, Left, Right } from 'monet';
+import { RoleRelationNotFoundError, RelationNotFoundError } from './errors/errors';
 
 export class UserRoleRelationMapper implements IUserRoleRelationMapper {
   fromEntity(entity: any): UserRoleRelation {
@@ -18,16 +17,6 @@ export class UserRoleRelationMapper implements IUserRoleRelationMapper {
   }
 }
 
-export interface IUserRoleRelService {
-  getAll(): Promise<UserRoleRelation[]>;
-
-  getByAccount(userId: string): Promise<UserRoleRelation[]>;
-
-  create(relation: UserRoleRelationForCreate): Promise<UserRoleRelation>;
-
-  delete(id: string): Promise<UserRoleRelation>;
-}
-
 @Injectable()
 export class UserRoleRelService implements IUserRoleRelService {
   constructor(
@@ -37,31 +26,30 @@ export class UserRoleRelService implements IUserRoleRelService {
 
   async create(relation: UserRoleRelationForCreate): Promise<UserRoleRelation> {
     const created = await this.relationModel.create(relation);
-
     return this.mapper.fromEntity(created);
   }
 
   async getAll(): Promise<UserRoleRelation[]> {
     const relations = await this.relationModel.find();
-
     return relations.map(this.mapper.fromEntity);
   }
 
-  async getByAccount(accountId: string): Promise<UserRoleRelation[]> {
-    const relations = await this.relationModel.find({ userId: accountId });
+  async getByAccount(
+    userId: string,
+  ): Promise<Either<RoleRelationNotFoundError, UserRoleRelation[]>> {
+    const relations = await this.relationModel.find({ userId });
 
     if (!relations.length) {
-      throw new Error(`Role relations for account ${accountId} not found`);
+      return Left(new RoleRelationNotFoundError(userId));
     }
-
-    return relations.map(this.mapper.fromEntity);
+    return Right(relations.map(this.mapper.fromEntity));
   }
 
-  async delete(id: string): Promise<UserRoleRelation> {
+  async delete(id: string): Promise<Either<RelationNotFoundError, UserRoleRelation>> {
     const userRoleRel = await this.relationModel.findById(id);
 
     if (!userRoleRel) {
-      throw new Error(`Relation ${id} not found`);
+      return Left(new RelationNotFoundError(id));
     }
 
     const deleted = await this.relationModel.findByIdAndUpdate(
@@ -70,6 +58,6 @@ export class UserRoleRelService implements IUserRoleRelService {
       { new: true },
     );
 
-    return this.mapper.fromEntity(deleted);
+    return Right(this.mapper.fromEntity(deleted));
   }
 }

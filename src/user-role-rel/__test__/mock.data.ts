@@ -1,5 +1,5 @@
 // import { UserRoleRelationForCreate } from '../models/user-role-rel.model';
-import { objectId } from '../../common';
+import { ObjectID } from '../../common';
 import { userRoleRelModel } from '../schema/user-role-rel.schema';
 import { UserRoleRelationMapper } from '../user-role-rel.service';
 
@@ -10,8 +10,8 @@ export async function getMockUserRoleRelations() {
 
   for (let index = 0; index < 20; index++) {
     const rel = {
-      roleId: new objectId(),
-      userId: new objectId(),
+      roleId: new ObjectID(),
+      userId: new ObjectID(),
     };
 
     const mockRelation = await userRoleRelModel.create(rel);

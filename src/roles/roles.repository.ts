@@ -1,7 +1,7 @@
 import { Role, RoleForCreate, RoleForUpdate } from './models/role.model';
 import { Model } from 'mongoose';
 import { RoleDocument } from './schema/role.schema';
-import { IRolesMapper, IRolesRepository } from './interface/interface';
+import { IRolesMapper, IRolesRepository } from './interfaces/interfaces';
 import { RoleNotFoundError } from './errors/errors';
 import { Either, Left, Right } from 'monet';
 

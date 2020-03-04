@@ -23,7 +23,7 @@ import {
   ApiConflictResponse,
 } from '@nestjs/swagger';
 import { Roles } from '../auth/auth.roles.decorator';
-import { IRolesService } from './interface/interface';
+import { IRolesService } from './interfaces/interfaces';
 import { ROLES_SERVICE } from '../constants';
 import { identity } from 'rxjs';
 import { RoleNotFoundError, RoleAlreadyExistsError } from './errors/errors';

@@ -1,5 +1,5 @@
 import { RolesService } from '../roles.service';
-import { establishDbConnection, closeDbConnection, sample, objectId } from '../../common';
+import { establishDbConnection, closeDbConnection, sample, ObjectID } from '../../common';
 import { Role, RoleForCreate, RoleForUpdate } from '../models/role.model';
 import { getMockRoles } from './mock.data';
 import { RolesRepository, RolesMapper } from '../roles.repository';
@@ -72,7 +72,7 @@ describe('Roles service', () => {
     });
 
     it('should return "RoleNotFoundError" in case if role is not found', async () => {
-      const id = new objectId().toHexString();
+      const id = new ObjectID().toHexString();
 
       const result = await rolesService.findOne(id);
       const error = result.left();
@@ -99,7 +99,7 @@ describe('Roles service', () => {
     });
 
     it('should return "RoleNotFoundError" in case if role for update is not exist', async () => {
-      const id = new objectId().toHexString();
+      const id = new ObjectID().toHexString();
       const patch: RoleForUpdate = {
         description: 'some_text',
       };
@@ -122,7 +122,7 @@ describe('Roles service', () => {
     });
 
     it('should return "RoleNotFoundError" in case if role for delete is not exist', async () => {
-      const id = new objectId().toHexString();
+      const id = new ObjectID().toHexString();
 
       const result = await rolesService.delete(id);
       const error = result.left();
