@@ -1,9 +1,10 @@
 import { UsersRepository, UsersMapper } from '../users.repository';
 import { usersModel } from '../schema/user.schema';
 import { UserForCreate, UserForUpdate, User } from '../models/user.model';
-import { establishDbConnection, closeDbConnection, sample } from '../../common';
+import { establishDbConnection, closeDbConnection, sample, ObjectID } from '../../common';
 import { getMockUsers } from './mock.data';
 import * as faker from 'faker';
+import { UserNotFoundError } from '../errors/errors';
 
 faker.seed(347);
 
@@ -26,60 +27,103 @@ describe('Users repository', () => {
     repository = new UsersRepository(usersModel, mapper);
   });
 
-  it('should create user', async () => {
-    const user: UserForCreate = {
-      username: faker.internet.userName(),
-      password: faker.internet.password(),
-    };
+  describe('create', () => {
+    it('should create user', async () => {
+      const user: UserForCreate = {
+        username: faker.internet.userName(),
+        password: faker.internet.password(),
+      };
 
-    const createdUser = await repository.create(user);
+      const createdUser = await repository.create(user);
 
-    expect(createdUser.id).toBeDefined();
-    expect(createdUser.username).toBe(user.username);
-    expect(createdUser.password).toBe(user.password);
-  });
-
-  it('should get all users', async () => {
-    const users = await repository.getAll();
-
-    expect(users.length).toBeGreaterThan(0);
-  });
-
-  it('should get non deleted users', async () => {
-    const users = await repository.getAll({ isDeleted: false });
-
-    users.map(user => {
-      expect(user.isDeleted).toBe(false);
+      expect(createdUser.id).toBeDefined();
+      expect(createdUser.username).toBe(user.username);
+      expect(createdUser.password).toBe(user.password);
     });
   });
 
-  it('should get user by id', async () => {
-    const userForCreate = {
-      id: '5e4c3dbfc074d01fe5dac20f',
-      username: faker.internet.userName(),
-      password: faker.internet.password(),
-    };
+  describe('get', () => {
+    it('should get all users', async () => {
+      const users = await repository.getAll();
 
-    const user = await repository.create(userForCreate);
-    const foundUser = await repository.findOne(user.id);
+      expect(users.length).toBeGreaterThan(0);
+    });
 
-    expect(foundUser.id).toBe(user.id);
+    it('should get non deleted users', async () => {
+      const users = await repository.getAll({ isDeleted: false });
+
+      users.map(user => {
+        expect(user.isDeleted).toBe(false);
+      });
+    });
+
+    it('should get user by id', async () => {
+      const userForCreate = {
+        id: '5e4c3dbfc074d01fe5dac20f',
+        username: faker.internet.userName(),
+        password: faker.internet.password(),
+      };
+
+      const user = await repository.create(userForCreate);
+      const result = await repository.findOne(user.id);
+      const foundUser = result.right();
+
+      expect(foundUser.id).toBe(user.id);
+    });
+
+    it('should return "UserNotFoundError" if user not found', async () => {
+      const id = new ObjectID().toHexString();
+
+      const result = await repository.findOne(id);
+      const error = result.left();
+
+      expect(error).toBeInstanceOf(UserNotFoundError);
+    });
   });
 
-  it('should update user', async () => {
-    const id = sample(mockUsers).id;
-    const patch: UserForUpdate = {
-      username: faker.internet.userName(),
-    };
+  describe('update', () => {
+    it('should update user', async () => {
+      const id = sample(mockUsers).id;
+      const patch: UserForUpdate = {
+        username: faker.internet.userName(),
+      };
 
-    const updatedUser = await repository.update(id, patch);
-    expect(updatedUser.username).toBe(patch.username);
+      const result = await repository.update(id, patch);
+      const updatedUser = result.right();
+
+      expect(updatedUser.username).toBe(patch.username);
+    });
+
+    it('should return "UserNotFoundError" if user for update not found', async () => {
+      const id = new ObjectID().toHexString();
+      const patch: UserForUpdate = {
+        username: faker.internet.userName(),
+      };
+
+      const result = await repository.update(id, patch);
+      const error = result.left();
+
+      expect(error).toBeInstanceOf(UserNotFoundError);
+    });
   });
 
-  it('should remove user by id', async () => {
-    const id = sample(mockUsers).id;
+  describe('delete', () => {
+    it('should remove user by id', async () => {
+      const id = sample(mockUsers).id;
 
-    const result = await repository.delete(id);
-    expect(result.isDeleted).toBe(true);
+      const result = await repository.delete(id);
+      const user = result.right();
+
+      expect(user.isDeleted).toBe(true);
+    });
+
+    it('should return "UserNotFoundError" if user for delete not found', async () => {
+      const id = new ObjectID().toHexString();
+
+      const result = await repository.delete(id);
+      const error = result.left();
+
+      expect(error).toBeInstanceOf(UserNotFoundError);
+    });
   });
 });

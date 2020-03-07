@@ -3,17 +3,11 @@ import { NestFactory, Reflector } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { createLogger, format, Logger, transports } from 'winston';
 import { AppModule } from './app.module';
-import { AuthGuard } from './auth/auth.guard';
-import { authenticate as _authenticate } from './auth/auth.middleware';
+import { authenticate as _authenticate, AuthGuard } from './auth';
 import { LoggingInterceptor } from './logging.interceptor';
-import { RolesMapper, RolesRepository } from './roles/roles.repository';
-import { RolesService } from './roles/roles.service';
-import { rolesModel } from './roles/schema/role.schema';
-import { userRoleRelModel } from './user-role-rel/schema/user-role-rel.schema';
-import { UserRoleRelationMapper, UserRoleRelService } from './user-role-rel/user-role-rel.service';
-import { usersModel } from './users/schema/user.schema';
-import { UsersMapper, UsersRepository } from './users/users.repository';
-import { UsersService } from './users/users.service';
+import { RolesMapper, rolesModel, RolesRepository, RolesService } from './roles';
+import { UserRoleRelationMapper, userRoleRelModel, UserRoleRelService } from './user-role-rel';
+import { UsersMapper, usersModel, UsersRepository, UsersService } from './users';
 
 async function bootstrap() {
   const mapper = new UserRoleRelationMapper();

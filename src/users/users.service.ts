@@ -1,35 +1,18 @@
-import {
-  Injectable,
-  OnModuleInit,
-  BadRequestException,
-  NotFoundException,
-  Inject,
-} from '@nestjs/common';
-import { AuthenticatedUser, UserForCreate, User, UserForUpdate } from './models/user.model';
-import { IUsersRepository } from './users.repository';
-import { IRolesService, RoleForCreate } from '../roles';
-import { IUserRoleRelService } from '../user-role-rel/interfaces/interfaces';
+import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
+import { Either, Left, Right } from 'monet';
+import { identity } from 'rxjs';
 import { ROLES_SERVICE, USER_ROLE_RELATION_SERVICE } from '../constants';
-
-export type QueryParams = {
-  username?: string;
-  password?: string;
-  isDeleted?: boolean;
-};
-
-export interface IUsersService {
-  getUserCredentials(username: string, password: string): Promise<AuthenticatedUser | undefined>;
-
-  getAll(): Promise<User[]>;
-
-  findOne(id: string): Promise<User>;
-
-  addUser(user: UserForCreate, roleId: string): Promise<User>;
-
-  updateUser(id: string, patch: UserForUpdate): Promise<User>;
-
-  removeUser(id: string): Promise<User>;
-}
+import {
+  IRolesService,
+  Role,
+  RoleAlreadyExistsError,
+  RoleForCreate,
+  RoleNotFoundError,
+} from '../roles';
+import { IUserRoleRelService, RoleRelationNotFoundError } from '../user-role-rel';
+import { UserAlreadyExistsError, UserNotFoundError } from './errors/errors';
+import { IUsersRepository, IUsersService, QueryParams } from './interfaces/interfaces';
+import { AuthenticatedUser, User, UserForCreate, UserForUpdate } from './models/user.model';
 
 @Injectable()
 export class UsersService implements IUsersService, OnModuleInit {
@@ -42,45 +25,39 @@ export class UsersService implements IUsersService, OnModuleInit {
   ) {}
 
   async onModuleInit() {
-    const isUserExists = await this.isUserAlreadyExists('admin');
+    const user: UserForCreate = {
+      username: 'admin',
+      password: '123',
+    };
 
-    if (!isUserExists) {
-      const user: UserForCreate = {
-        username: 'admin',
-        password: '123',
-      };
-
-      const admin = await this.createAdminUser(user);
-
+    const eitherCreate = await this.createAdminUser(user);
+    return eitherCreate.forEach(admin => {
       console.info(`Admin user created with password ${user.password}`);
-      return admin;
-    }
-
-    return;
+      return identity(admin);
+    });
   }
 
-  // TODO: provide proper error handling
   async getUserCredentials(
     username: string,
     password: string,
-  ): Promise<AuthenticatedUser | undefined> {
+  ): Promise<Either<RoleRelationNotFoundError | RoleNotFoundError, AuthenticatedUser>> {
     const query = { username, password };
     const [user] = await this.usersRepo.getAll(query);
 
-    if (user) {
-      const eitherGetByAccount = await this.userRoleRelService.getByAccount(user.id);
-      // TODO: implement error handling
-      const [userRoleRel] = eitherGetByAccount.right();
-      const result = await this.rolesService.findOne(userRoleRel.roleId);
-      const role = result.right();
+    type GetRoleResult = Either<RoleNotFoundError, Role>;
+    const eitherGetByAccount = await this.userRoleRelService.getByAccount(user.id);
+    const eitherGetRole = await eitherGetByAccount.cata(
+      async (error): Promise<GetRoleResult> => Left(error),
+      relations => {
+        const [relation] = relations;
+        return this.rolesService.findOne(relation.roleId);
+      },
+    );
 
-      return {
-        username: user.username,
-        roles: [role.name],
-      };
-    }
-
-    return undefined;
+    return eitherGetRole.map(role => ({
+      username: user.username,
+      roles: [role.name],
+    }));
   }
 
   private async isUserAlreadyExists(username: string): Promise<boolean> {
@@ -90,71 +67,63 @@ export class UsersService implements IUsersService, OnModuleInit {
     if (user) {
       return true;
     }
-
     return false;
   }
 
-  // TODO: provide proper error handling
-  private async createAdminUser(user: UserForCreate) {
-    const role: RoleForCreate = {
+  private async createAdminUser(
+    user: UserForCreate,
+  ): Promise<Either<RoleAlreadyExistsError, User>> {
+    const roleForCreate: RoleForCreate = {
       name: 'admin',
       displayName: 'ADMIN',
       description: 'admin role with access to all API routes',
     };
 
     const createdUser = await this.usersRepo.create(user);
-    const result = await this.rolesService.create(role);
-    const createdRole = result.right();
+    const eitherCreate = await this.rolesService.create(roleForCreate);
 
-    const relation = {
-      userId: createdUser.id,
-      roleId: createdRole.id,
-    };
+    eitherCreate.map(async role => {
+      const relation = {
+        userId: createdUser.id,
+        roleId: role.id,
+      };
 
-    await this.userRoleRelService.create(relation);
+      await this.userRoleRelService.create(relation);
+    });
 
-    return createdUser;
+    return Right(createdUser);
   }
 
-  async getAll(): Promise<User[]> {
-    return this.usersRepo.getAll();
+  async getAll(query?: QueryParams): Promise<User[]> {
+    return this.usersRepo.getAll(query);
   }
 
-  async findOne(id: string): Promise<User> {
+  async findOne(id: string): Promise<Either<UserNotFoundError, User>> {
     return this.usersRepo.findOne(id);
   }
 
-  async addUser(user: UserForCreate, roleId: string): Promise<User> {
+  async addUser(
+    user: UserForCreate,
+    roleId: string,
+  ): Promise<Either<UserAlreadyExistsError, User>> {
     const { username } = user;
     const isUserExists = await this.isUserAlreadyExists(username);
 
     if (isUserExists) {
-      throw new BadRequestException(`User ${username} already exists`);
+      return Left(new UserAlreadyExistsError(username));
     }
 
     const createdUser = await this.usersRepo.create(user);
     await this.userRoleRelService.create({ userId: createdUser.id, roleId });
 
-    return createdUser;
+    return Right(createdUser);
   }
 
-  async updateUser(id: string, patch: UserForUpdate): Promise<User> {
-    const user = await this.usersRepo.findOne(id);
-
-    if (!user) {
-      throw new NotFoundException(`User ${id} not found`);
-    }
-
+  async updateUser(id: string, patch: UserForUpdate): Promise<Either<UserNotFoundError, User>> {
     return this.usersRepo.update(id, patch);
   }
 
-  async removeUser(id: string): Promise<User> {
-    const user = await this.usersRepo.findOne(id);
-
-    if (!user) {
-      throw new NotFoundException(`User ${id} not found`);
-    }
-
+  async removeUser(id: string): Promise<Either<UserNotFoundError, User>> {
     return this.usersRepo.delete(id);
   }
 }

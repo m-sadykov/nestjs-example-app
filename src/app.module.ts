@@ -1,12 +1,10 @@
-import { Module, DynamicModule } from '@nestjs/common';
-import { ConfigModule } from './config/config.module';
-import { UsersModule } from './users/users.module';
-import { UserRoleRelModule } from './user-role-rel/user-role-rel.module';
-import { IUsersService } from './users/users.service';
+import { DynamicModule, Module } from '@nestjs/common';
+import { Authenticate } from './auth';
+import { ConfigModule } from './config';
+import { DatabaseModule } from './database';
 import { IRolesService, RolesModule } from './roles';
-import { IUserRoleRelService } from './user-role-rel/interfaces/interfaces';
-import { Authenticate } from './auth/auth.middleware';
-import { DatabaseModule } from './database/database.module';
+import { IUserRoleRelService, UserRoleRelModule } from './user-role-rel';
+import { IUsersService, UsersModule } from './users';
 
 @Module({})
 export class AppModule {

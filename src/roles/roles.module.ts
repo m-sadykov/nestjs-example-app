@@ -2,7 +2,7 @@ import { Module, DynamicModule, NestModule, MiddlewareConsumer, Inject } from '@
 import { RolesController } from './roles.controller';
 import { IRolesService } from './interfaces/interfaces';
 import { ROLES_SERVICE, AUTHENTICATE } from '../constants';
-import { Authenticate } from '../auth/auth.middleware';
+import { Authenticate } from '../auth';
 
 @Module({})
 export class RolesModule implements NestModule {

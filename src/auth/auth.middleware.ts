@@ -1,6 +1,6 @@
 import { UnauthorizedException } from '@nestjs/common';
 import { Response, NextFunction } from 'express';
-import { IUsersService } from '../users/users.service';
+import { IUsersService } from '../users/';
 
 export type AuthenticatedRequest = {
   [key: string]: any;

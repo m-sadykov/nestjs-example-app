@@ -2,7 +2,7 @@ import { Module, DynamicModule, NestModule, Inject, MiddlewareConsumer } from '@
 import { UserRoleRelController } from './user-role-rel.controller';
 import { IUserRoleRelService } from './interfaces/interfaces';
 import { USER_ROLE_RELATION_SERVICE, AUTHENTICATE } from '../constants';
-import { Authenticate } from '../auth/auth.middleware';
+import { Authenticate } from '../auth';
 
 @Module({})
 export class UserRoleRelModule implements NestModule {

@@ -1,6 +1,6 @@
 import { Module, DynamicModule, Inject, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { UsersController } from './users.controller';
-import { IUsersService } from './users.service';
+import { IUsersService } from './interfaces/interfaces';
 import { IRolesService } from '../roles/';
 import { IUserRoleRelService } from '../user-role-rel/interfaces/interfaces';
 import {
@@ -9,7 +9,7 @@ import {
   USERS_SERVICE,
   AUTHENTICATE,
 } from '../constants';
-import { Authenticate } from '../auth/auth.middleware';
+import { Authenticate } from '../auth';
 
 @Module({})
 export class UsersModule implements NestModule {

@@ -2,7 +2,7 @@ import * as dotenv from 'dotenv';
 import * as Joi from '@hapi/joi';
 import * as fs from 'fs';
 
-export type EnvConfig = {
+type EnvConfig = {
   [key: string]: string;
 };
 
@@ -22,9 +22,7 @@ export class ConfigService {
       MONGO_URL: Joi.string(),
     });
 
-    const { error, value: validatedEnvConfig } = envVarSchema.validate(
-      envConfig,
-    );
+    const { error, value: validatedEnvConfig } = envVarSchema.validate(envConfig);
 
     if (error) {
       throw new Error(`Config validation error: ${error.message}`);

@@ -1,23 +1,9 @@
 import { UserForCreate, User, UserForUpdate } from './models/user.model';
 import { UserDocument } from './schema/user.schema';
 import { Model } from 'mongoose';
-import { QueryParams } from './users.service';
-
-export interface IUsersRepository {
-  create(user: UserForCreate): Promise<User>;
-
-  getAll(query?: QueryParams): Promise<User[]>;
-
-  findOne(id: string): Promise<User>;
-
-  update(id: string, patch: UserForUpdate): Promise<User>;
-
-  delete(id: string): Promise<User>;
-}
-
-interface IUsersMapper {
-  fromEntity(entity: any): User;
-}
+import { QueryParams, IUsersMapper, IUsersRepository } from './interfaces/interfaces';
+import { Either, Left, Right } from 'monet';
+import { UserNotFoundError } from './errors/errors';
 
 export class UsersMapper implements IUsersMapper {
   fromEntity(entity: any): User {
@@ -35,7 +21,6 @@ export class UsersRepository implements IUsersRepository {
 
   async create(user: UserForCreate): Promise<User> {
     const createdUser = await this.database.create(user);
-
     return this.mapper.fromEntity(createdUser);
   }
 
@@ -51,39 +36,36 @@ export class UsersRepository implements IUsersRepository {
     return users.map(this.mapper.fromEntity);
   }
 
-  async findOne(id: string): Promise<User> {
+  async findOne(id: string): Promise<Either<UserNotFoundError, User>> {
     const user = await this.database.findById(id);
 
     if (!user) {
-      throw Error(`User with ${id} not found`);
+      return Left(new UserNotFoundError(id));
     }
-
-    return this.mapper.fromEntity(user);
+    return Right(this.mapper.fromEntity(user));
   }
 
-  async update(id: string, patch: UserForUpdate): Promise<User> {
-    const user = await this.findOne(id);
+  async update(id: string, patch: UserForUpdate): Promise<Either<UserNotFoundError, User>> {
+    const eitherGetUser = await this.findOne(id);
 
-    if (!user) {
-      throw new Error(`User with ${id} not found`);
+    if (eitherGetUser.isLeft()) {
+      return Left(new UserNotFoundError(id));
     }
 
     const updated = await this.database.findByIdAndUpdate(id, patch, {
       new: true,
     });
-
-    return this.mapper.fromEntity(updated);
+    return Right(this.mapper.fromEntity(updated));
   }
 
-  async delete(id: string): Promise<User> {
-    const user = await this.findOne(id);
+  async delete(id: string): Promise<Either<UserNotFoundError, User>> {
+    const eitherGetUser = await this.findOne(id);
 
-    if (!user) {
-      throw new Error(`User with ${id} not found`);
+    if (eitherGetUser.isLeft()) {
+      return Left(new UserNotFoundError(id));
     }
 
     const deleted = await this.database.findByIdAndUpdate(id, { isDeleted: true }, { new: true });
-
-    return this.mapper.fromEntity(deleted);
+    return Right(this.mapper.fromEntity(deleted));
   }
 }

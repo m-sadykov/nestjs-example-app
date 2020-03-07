@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { ApiTags, ApiResponse, ApiBasicAuth } from '@nestjs/swagger';
 import { UserRoleRelPresentationDto } from './dto/user-role-rel.dto';
-import { Roles } from '../auth/auth.roles.decorator';
+import { Roles } from '../auth';
 import { IUserRoleRelService } from './interfaces/interfaces';
 import { USER_ROLE_RELATION_SERVICE } from '../constants';
 import { identity } from 'rxjs';
