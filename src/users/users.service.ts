@@ -1,6 +1,5 @@
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { Either, Left, Right } from 'monet';
-import { identity } from 'rxjs';
 import { ROLES_SERVICE, USER_ROLE_RELATION_SERVICE } from '../constants';
 import {
   IRolesService,
@@ -25,15 +24,20 @@ export class UsersService implements IUsersService, OnModuleInit {
   ) {}
 
   async onModuleInit() {
+    const existingAdmin = await this.isUserAlreadyExists('admin');
+
+    if (existingAdmin) {
+      return;
+    }
+
     const user: UserForCreate = {
       username: 'admin',
       password: '123',
     };
 
     const eitherCreate = await this.createAdminUser(user);
-    return eitherCreate.forEach(admin => {
+    return eitherCreate.map(() => {
       console.info(`Admin user created with password ${user.password}`);
-      return identity(admin);
     });
   }
 

@@ -23,11 +23,11 @@ export function authenticate(usersService: IUsersService): Authenticate {
     const [username, password] = getAuthorizationCredentials(authHeaders);
     const user = await usersService.getUserCredentials(username, password);
 
-    if (!user) {
+    if (user.isLeft()) {
       throw new UnauthorizedException();
     }
 
-    req.user = user;
+    req.user = user.right();
 
     next();
   };

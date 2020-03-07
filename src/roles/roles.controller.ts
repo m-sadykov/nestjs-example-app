@@ -7,9 +7,9 @@ import {
   Patch,
   Delete,
   Inject,
-  NotFoundException,
-  BadRequestException,
   HttpStatus,
+  NotFoundException,
+  ConflictException,
 } from '@nestjs/common';
 import { CreateRoleDto, UpdateRoleDto, RolePresentationDto } from './dto/role.dto';
 import {
@@ -92,8 +92,8 @@ export class RolesController {
 
     return result.cata(error => {
       if (error instanceof RoleAlreadyExistsError) {
-        throw new BadRequestException({
-          status: HttpStatus.BAD_REQUEST,
+        throw new ConflictException({
+          status: HttpStatus.CONFLICT,
           error: error.name,
           message: error.message,
         });

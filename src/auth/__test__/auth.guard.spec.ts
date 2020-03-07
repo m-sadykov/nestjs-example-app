@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import { AuthGuard } from '../auth.guard';
 import { AuthenticatedRequest, authenticate as _authenticate } from '../auth.middleware';
+import { Right } from 'monet';
 
 describe('Auth Guard', () => {
   const reflector = {
@@ -36,7 +37,7 @@ describe('Auth Guard', () => {
       };
     });
 
-    userService.getUserCredentials.mockResolvedValueOnce(Promise.resolve(mockUser));
+    userService.getUserCredentials.mockResolvedValueOnce(Promise.resolve(Right(mockUser)));
 
     await authenticate(request, response as any, next);
   }

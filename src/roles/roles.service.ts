@@ -12,7 +12,7 @@ export class RolesService implements IRolesService {
     const isRoleExists = await this.rolesRepo.isRoleAlreadyExists(role.name);
 
     if (isRoleExists) {
-      return Left(new RoleAlreadyExistsError(`Role name ${role.name} already exists.`));
+      return Left(new RoleAlreadyExistsError(role.name));
     }
 
     const createdRole = await this.rolesRepo.create(role);
