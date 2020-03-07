@@ -18,7 +18,7 @@ describe('Auth Guard', () => {
     getHandler: jest.fn(),
     switchToHttp: jest.fn(),
   };
-  const roles = ['admin', 'reader', 'writer'];
+  const roles = ['admin', 'guest'];
 
   let mockReflectorSpy: any = jest.fn();
 
@@ -71,7 +71,7 @@ describe('Auth Guard', () => {
   it('should return false if user has invalid roles assigned', async () => {
     const user = {
       username: 'username',
-      roles: ['guest'],
+      roles: ['non_existing_role'],
     };
 
     await mockAuthenticateUserImplementationOnce(user);

@@ -38,10 +38,9 @@ export class RolesController {
   ) {}
 
   @Get()
-  @Roles(['admin', 'writer'])
+  @Roles(['admin', 'guest'])
   @ApiResponse({ status: 200, type: [RolePresentationDto] })
   @ApiForbiddenResponse({ status: 403, description: 'Forbidden' })
-  @ApiConflictResponse({ status: 409, description: 'Already exists' })
   @ApiOperation({
     summary: 'Get roles',
     description: 'Get all existing roles',
@@ -51,7 +50,7 @@ export class RolesController {
   }
 
   @Get(':id')
-  @Roles(['admin', 'writer'])
+  @Roles(['admin', 'guest'])
   @ApiResponse({ status: 200, type: RolePresentationDto })
   @ApiForbiddenResponse({ status: 403, description: 'Forbidden' })
   @ApiNotFoundResponse({ status: 404, description: 'Not Found' })
@@ -83,6 +82,7 @@ export class RolesController {
   @Roles(['admin'])
   @ApiResponse({ status: 201, type: RolePresentationDto })
   @ApiForbiddenResponse({ status: 403, description: 'Forbidden' })
+  @ApiConflictResponse({ status: 409, description: 'Conflict' })
   @ApiOperation({
     summary: 'Add new role',
     description: 'Create new role',
