@@ -1,7 +1,15 @@
-import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nestjs/common';
+import {
+  Injectable,
+  NestInterceptor,
+  ExecutionContext,
+  CallHandler,
+  InternalServerErrorException,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
 import { Logger } from 'winston';
 import { Request } from 'express';
-import { Observable, throwError } from 'rxjs';
+import { Observable } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
 @Injectable()
@@ -14,13 +22,20 @@ export class LoggingInterceptor implements NestInterceptor {
 
     return next.handle().pipe(
       catchError(error => {
+        if (error instanceof HttpException) {
+          throw error;
+        }
+
         this.logger.error({
           url,
           method,
           message: error.message,
         });
 
-        return throwError(error);
+        throw new InternalServerErrorException({
+          statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: 'Internal Server Error',
+        });
       }),
     );
   }

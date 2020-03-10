@@ -1,15 +1,15 @@
 import * as mongoose from 'mongoose';
 // tslint:disable-next-line: no-implicit-dependencies
 import { MongoMemoryServer } from 'mongodb-memory-server';
-import { User } from './users/models/user.model';
-import { Role } from './roles/models/role.model';
-import { UserRoleRelation } from './user-role-rel/models/user-role-rel.model';
+import { User } from './users';
+import { Role } from './roles';
+import { UserRoleRelation } from './user-role-rel';
 
 export type ObjectId = mongoose.Schema.Types.ObjectId;
 export const ObjectID = mongoose.mongo.ObjectId;
 
 // testing
-const mongoServer = new MongoMemoryServer();
+const mongoMemoryServer = new MongoMemoryServer();
 
 export async function establishDbConnection() {
   const options = {
@@ -19,14 +19,13 @@ export async function establishDbConnection() {
     useFindAndModify: false,
   };
 
-  const uri = await mongoServer.getUri();
-
+  const uri = await mongoMemoryServer.getUri();
   await mongoose.connect(uri, options);
 }
 
 export async function closeDbConnection() {
   await mongoose.disconnect();
-  await mongoServer.stop();
+  await mongoMemoryServer.stop();
 }
 
 // lodash sample

@@ -26,7 +26,7 @@ import { Roles } from '../auth';
 import { IRolesService } from './interfaces/interfaces';
 import { ROLES_SERVICE } from '../constants';
 import { identity } from 'rxjs';
-import { RoleNotFoundError, RoleAlreadyExistsError } from './errors/errors';
+import { ObjectIdValidationPipe } from '../object-id.validation.pipe';
 
 @ApiBasicAuth()
 @ApiTags('roles')
@@ -63,18 +63,15 @@ export class RolesController {
     summary: 'Get role',
     description: 'Get specific role by id',
   })
-  async findOne(@Param('id') id: string): Promise<RolePresentationDto> {
+  async findOne(@Param('id', ObjectIdValidationPipe) id: string): Promise<RolePresentationDto> {
     const result = await this.rolesService.findOne(id);
 
     return result.cata(error => {
-      if (error instanceof RoleNotFoundError) {
-        throw new NotFoundException({
-          status: HttpStatus.NOT_FOUND,
-          error: error.name,
-          message: error.message,
-        });
-      }
-      throw error;
+      throw new NotFoundException({
+        status: HttpStatus.NOT_FOUND,
+        error: error.name,
+        message: error.message,
+      });
     }, identity);
   }
 
@@ -82,7 +79,7 @@ export class RolesController {
   @Roles(['admin'])
   @ApiResponse({ status: 201, type: RolePresentationDto })
   @ApiForbiddenResponse({ status: 403, description: 'Forbidden' })
-  @ApiConflictResponse({ status: 409, description: 'Conflict' })
+  @ApiConflictResponse({ status: 409, description: 'Role is already exists' })
   @ApiOperation({
     summary: 'Add new role',
     description: 'Create new role',
@@ -91,14 +88,11 @@ export class RolesController {
     const result = await this.rolesService.create(createRoleDto);
 
     return result.cata(error => {
-      if (error instanceof RoleAlreadyExistsError) {
-        throw new ConflictException({
-          status: HttpStatus.CONFLICT,
-          error: error.name,
-          message: error.message,
-        });
-      }
-      throw error;
+      throw new ConflictException({
+        status: HttpStatus.CONFLICT,
+        error: error.name,
+        message: error.message,
+      });
     }, identity);
   }
 
@@ -117,20 +111,17 @@ export class RolesController {
     description: 'Update specific role by id',
   })
   async updateRole(
-    @Param('id') id: string,
+    @Param('id', ObjectIdValidationPipe) id: string,
     @Body() updateRoleDto: UpdateRoleDto,
   ): Promise<RolePresentationDto> {
     const result = await this.rolesService.update(id, updateRoleDto);
 
     return result.cata(error => {
-      if (error instanceof RoleNotFoundError) {
-        throw new NotFoundException({
-          status: HttpStatus.NOT_FOUND,
-          error: error.name,
-          message: error.message,
-        });
-      }
-      throw error;
+      throw new NotFoundException({
+        status: HttpStatus.NOT_FOUND,
+        error: error.name,
+        message: error.message,
+      });
     }, identity);
   }
 
@@ -148,18 +139,15 @@ export class RolesController {
     summary: 'Delete role',
     description: 'Remove specific role by id',
   })
-  async removeRole(@Param('id') id: string): Promise<RolePresentationDto> {
+  async removeRole(@Param('id', ObjectIdValidationPipe) id: string): Promise<RolePresentationDto> {
     const result = await this.rolesService.delete(id);
 
     return result.cata(error => {
-      if (error instanceof RoleNotFoundError) {
-        throw new NotFoundException({
-          status: HttpStatus.NOT_FOUND,
-          error: error.name,
-          message: error.message,
-        });
-      }
-      throw error;
+      throw new NotFoundException({
+        status: HttpStatus.NOT_FOUND,
+        error: error.name,
+        message: error.message,
+      });
     }, identity);
   }
 }

@@ -28,7 +28,7 @@ import { Roles } from '../auth';
 import { IUsersService } from './interfaces/interfaces';
 import { USERS_SERVICE } from '../constants';
 import { identity } from 'rxjs';
-import { UserNotFoundError, UserAlreadyExistsError } from './errors/errors';
+import { ObjectIdValidationPipe } from '../object-id.validation.pipe';
 
 @ApiBasicAuth()
 @ApiTags('users')
@@ -66,17 +66,14 @@ export class UsersController {
     summary: 'Get user',
     description: 'Get specific user by id',
   })
-  async findOne(@Param('id') id: string): Promise<UserPresentationDto> {
+  async findOne(@Param('id', ObjectIdValidationPipe) id: string): Promise<UserPresentationDto> {
     const result = await this.usersService.findOne(id);
     return result.cata(error => {
-      if (error instanceof UserNotFoundError) {
-        throw new NotFoundException({
-          status: HttpStatus.NOT_FOUND,
-          error: error.name,
-          message: error.message,
-        });
-      }
-      throw error;
+      throw new NotFoundException({
+        status: HttpStatus.NOT_FOUND,
+        error: error.name,
+        message: error.message,
+      });
     }, identity);
   }
 
@@ -85,7 +82,7 @@ export class UsersController {
   @ApiResponse({ status: 201, type: UserPresentationDto })
   @ApiForbiddenResponse({ status: 403, description: 'Forbidden' })
   @ApiNotFoundResponse({ status: 404, description: 'Not Found' })
-  @ApiConflictResponse({ status: 409, description: 'Conflict' })
+  @ApiConflictResponse({ status: 409, description: 'User already exists' })
   @ApiOperation({
     summary: 'Add new user',
     description: 'Create new user',
@@ -96,14 +93,11 @@ export class UsersController {
   ): Promise<UserPresentationDto> {
     const result = await this.usersService.addUser(createUserDto, roleId);
     return result.cata(error => {
-      if (error instanceof UserAlreadyExistsError) {
-        throw new ConflictException({
-          status: HttpStatus.CONFLICT,
-          error: error.name,
-          message: error.message,
-        });
-      }
-      throw error;
+      throw new ConflictException({
+        status: HttpStatus.CONFLICT,
+        error: error.name,
+        message: error.message,
+      });
     }, identity);
   }
 
@@ -122,19 +116,16 @@ export class UsersController {
     description: 'Update specific user by id',
   })
   async updateUser(
-    @Param('id') id: string,
+    @Param('id', ObjectIdValidationPipe) id: string,
     @Body() updateUserDto: UpdateUserDto,
   ): Promise<UserPresentationDto> {
     const result = await this.usersService.updateUser(id, updateUserDto);
     return result.cata(error => {
-      if (error instanceof UserNotFoundError) {
-        throw new NotFoundException({
-          status: HttpStatus.NOT_FOUND,
-          error: error.name,
-          message: error.message,
-        });
-      }
-      throw error;
+      throw new NotFoundException({
+        status: HttpStatus.NOT_FOUND,
+        error: error.name,
+        message: error.message,
+      });
     }, identity);
   }
 
@@ -152,17 +143,14 @@ export class UsersController {
     summary: 'Remove user',
     description: 'Delete specific user by id',
   })
-  async removeUser(@Param('id') id: string): Promise<UserPresentationDto> {
+  async removeUser(@Param('id', ObjectIdValidationPipe) id: string): Promise<UserPresentationDto> {
     const result = await this.usersService.removeUser(id);
     return result.cata(error => {
-      if (error instanceof UserNotFoundError) {
-        throw new NotFoundException({
-          status: HttpStatus.NOT_FOUND,
-          error: error.name,
-          message: error.message,
-        });
-      }
-      throw error;
+      throw new NotFoundException({
+        status: HttpStatus.NOT_FOUND,
+        error: error.name,
+        message: error.message,
+      });
     }, identity);
   }
 }

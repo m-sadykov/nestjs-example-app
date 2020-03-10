@@ -21,7 +21,7 @@ import { Roles } from '../auth';
 import { IUserRoleRelService } from './interfaces/interfaces';
 import { USER_ROLE_RELATION_SERVICE } from '../constants';
 import { identity } from 'rxjs';
-import { RoleRelationNotFoundError, RelationNotFoundError } from './errors/errors';
+import { ObjectIdValidationPipe } from '../object-id.validation.pipe';
 
 @ApiBasicAuth()
 @ApiTags('user-role-rel')
@@ -59,19 +59,16 @@ export class UserRoleRelController {
     description: 'Get specific relation by userId',
   })
   async getUserRoleRelByUserId(
-    @Param('userId') userId: string,
+    @Param('userId', ObjectIdValidationPipe) userId: string,
   ): Promise<UserRoleRelPresentationDto[]> {
     const result = await this.userRoleRelService.getByAccount(userId);
 
     return result.cata(error => {
-      if (error instanceof RoleRelationNotFoundError) {
-        throw new NotFoundException({
-          status: HttpStatus.NOT_FOUND,
-          error: error.name,
-          message: error.message,
-        });
-      }
-      throw error;
+      throw new NotFoundException({
+        status: HttpStatus.NOT_FOUND,
+        error: error.name,
+        message: error.message,
+      });
     }, identity);
   }
 
@@ -89,18 +86,17 @@ export class UserRoleRelController {
     summary: 'Remove relation',
     description: 'Remove specific relation by id',
   })
-  async removeRel(@Param('id') id: string): Promise<UserRoleRelPresentationDto> {
+  async removeRel(
+    @Param('id', ObjectIdValidationPipe) id: string,
+  ): Promise<UserRoleRelPresentationDto> {
     const result = await this.userRoleRelService.delete(id);
 
     return result.cata(error => {
-      if (error instanceof RelationNotFoundError) {
-        throw new NotFoundException({
-          status: HttpStatus.NOT_FOUND,
-          error: error.name,
-          message: error.message,
-        });
-      }
-      throw error;
+      throw new NotFoundException({
+        status: HttpStatus.NOT_FOUND,
+        error: error.name,
+        message: error.message,
+      });
     }, identity);
   }
 }
