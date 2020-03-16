@@ -2,7 +2,7 @@ import { Module, DynamicModule, Inject, NestModule, MiddlewareConsumer } from '@
 import { UsersController } from './users.controller';
 import { IUsersService } from './interfaces/interfaces';
 import { IRolesService } from '../roles/';
-import { IUserRoleRelService } from '../user-role-rel/interfaces/interfaces';
+import { IUserRoleRelService } from '../user-role-rel';
 import {
   ROLES_SERVICE,
   USER_ROLE_RELATION_SERVICE,

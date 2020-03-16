@@ -16,10 +16,11 @@ export class ConfigService {
 
   private validateInput(envConfig: EnvConfig): EnvConfig {
     const envVarSchema: Joi.ObjectSchema = Joi.object({
-      NODE_ENV: Joi.string()
-        .valid('dev', 'prod', 'test')
-        .default('dev'),
+      NODE_ENV: Joi.string().valid('dev', 'prod', 'test'),
+      // .default('dev'),
       MONGO_URL: Joi.string(),
+      PORT: Joi.number(),
+      URL: Joi.string(),
     });
 
     const { error, value: validatedEnvConfig } = envVarSchema.validate(envConfig);

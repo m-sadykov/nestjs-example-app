@@ -1,6 +1,10 @@
 import { UserRoleRelation, UserRoleRelationForCreate } from '../models/user-role-rel.model';
 import { Either } from 'monet';
-import { RoleRelationNotFoundError, RelationNotFoundError } from '../errors/errors';
+import {
+  RoleRelationNotFoundError,
+  RelationNotFoundError,
+  RoleRelationAlreadyExistsError,
+} from '../errors/errors';
 
 export interface IUserRoleRelationMapper {
   fromEntity(entity: any): UserRoleRelation;
@@ -11,7 +15,9 @@ export interface IUserRoleRelService {
 
   getByAccount(userId: string): Promise<Either<RoleRelationNotFoundError, UserRoleRelation[]>>;
 
-  create(relation: UserRoleRelationForCreate): Promise<UserRoleRelation>;
+  create(
+    relation: UserRoleRelationForCreate,
+  ): Promise<Either<RoleRelationAlreadyExistsError, UserRoleRelation>>;
 
   delete(id: string): Promise<Either<RelationNotFoundError, UserRoleRelation>>;
 }

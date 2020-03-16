@@ -87,11 +87,8 @@ export class UsersController {
     summary: 'Add new user',
     description: 'Create new user',
   })
-  async createUser(
-    @Body() createUserDto: CreateUserDto,
-    @Param() roleId: string,
-  ): Promise<UserPresentationDto> {
-    const result = await this.usersService.addUser(createUserDto, roleId);
+  async createUser(@Body() createUserDto: CreateUserDto): Promise<UserPresentationDto> {
+    const result = await this.usersService.addUser(createUserDto);
     return result.cata(error => {
       throw new ConflictException({
         status: HttpStatus.CONFLICT,

@@ -36,7 +36,7 @@ export interface IUsersService {
 
   findOne(id: string): Promise<Either<UserNotFoundError, User>>;
 
-  addUser(user: UserForCreate, roleId: string): Promise<Either<UserAlreadyExistsError, User>>;
+  addUser(user: UserForCreate): Promise<Either<UserAlreadyExistsError, User>>;
   updateUser(id: string, patch: UserForUpdate): Promise<Either<UserNotFoundError, User>>;
   removeUser(id: string): Promise<Either<UserNotFoundError, User>>;
 }

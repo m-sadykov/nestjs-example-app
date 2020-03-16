@@ -9,6 +9,8 @@ import { RolesMapper, rolesModel, RolesRepository, RolesService } from './roles'
 import { UserRoleRelationMapper, userRoleRelModel, UserRoleRelService } from './user-role-rel';
 import { UsersMapper, usersModel, UsersRepository, UsersService } from './users';
 
+export { bootstrap };
+
 async function bootstrap() {
   const mapper = new UserRoleRelationMapper();
   const userRoleRelService = new UserRoleRelService(userRoleRelModel, mapper);
@@ -58,5 +60,10 @@ async function bootstrap() {
 
   console.log(`Listening on port: ${port}`);
   console.log(`Explore api on http://localhost:${port}/api`);
+
+  return app;
 }
-bootstrap();
+
+if (require.main === module) {
+  bootstrap();
+}

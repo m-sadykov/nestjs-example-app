@@ -11,3 +11,10 @@ export class RelationNotFoundError extends Error {
     this.name = 'RelationNotFoundError';
   }
 }
+
+export class RoleRelationAlreadyExistsError extends Error {
+  constructor(roleId: string) {
+    super(`User role relation with role id:${roleId} already exists`);
+    this.name = 'RoleRelationAlreadyExistsError';
+  }
+}

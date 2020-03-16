@@ -49,7 +49,7 @@ export class UsersRepository implements IUsersRepository {
     const eitherGetUser = await this.findOne(id);
 
     if (eitherGetUser.isLeft()) {
-      return Left(new UserNotFoundError(id));
+      return eitherGetUser;
     }
 
     const updated = await this.database.findByIdAndUpdate(id, patch, {
@@ -62,7 +62,7 @@ export class UsersRepository implements IUsersRepository {
     const eitherGetUser = await this.findOne(id);
 
     if (eitherGetUser.isLeft()) {
-      return Left(new UserNotFoundError(id));
+      return eitherGetUser;
     }
 
     const deleted = await this.database.findByIdAndUpdate(id, { isDeleted: true }, { new: true });

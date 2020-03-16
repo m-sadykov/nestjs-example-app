@@ -131,9 +131,8 @@ describe('Users service', () => {
         username: 'test_user',
         password: 'pwd',
       };
-      const roleId = new ObjectID().toHexString();
 
-      const result = await usersService.addUser(userForCreate, roleId);
+      const result = await usersService.addUser(userForCreate);
       const user = result.right();
 
       expect(user.username).toBe(userForCreate.username);
@@ -142,9 +141,8 @@ describe('Users service', () => {
 
     it('should return "UserAlreadyExistsError" if user already exists', async () => {
       const existingUser = sample(mockUsers);
-      const roleId = new ObjectID().toHexString();
 
-      const result = await usersService.addUser(existingUser, roleId);
+      const result = await usersService.addUser(existingUser);
       const error = result.left();
 
       expect(error).toBeInstanceOf(UserAlreadyExistsError);

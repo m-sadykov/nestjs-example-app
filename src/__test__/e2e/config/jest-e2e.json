@@ -1,0 +1,18 @@
+{
+  "moduleFileExtensions": ["ts", "js", "json"],
+  "rootDir": "../",
+  "testRegex": "(.spec.ts$)",
+  "testEnvironment": "node",
+  "globalSetup": "./config/e2e.setup.ts",
+  "globalTeardown": "./config/e2e.teardown.ts",
+  "globals": {
+    "ts-jest": {
+      "tsConfig": "./tsconfig.json",
+      "diagnostics": false,
+      "isolatedModules": true
+    }
+  },
+  "transform": {
+    "^.+\\.ts$": "ts-jest"
+  }
+}

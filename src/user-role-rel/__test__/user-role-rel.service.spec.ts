@@ -3,7 +3,11 @@ import { userRoleRelModel } from '../schema/user-role-rel.schema';
 import { getMockUserRoleRelations } from './mock.data';
 import { establishDbConnection, closeDbConnection, sample, ObjectID } from '../../common';
 import { UserRoleRelation, UserRoleRelationForCreate } from '../models/user-role-rel.model';
-import { RoleRelationNotFoundError, RelationNotFoundError } from '../errors/errors';
+import {
+  RoleRelationNotFoundError,
+  RelationNotFoundError,
+  RoleRelationAlreadyExistsError,
+} from '../errors/errors';
 
 describe('UserRoleRelations service', () => {
   let userRoleRelService: UserRoleRelService;
@@ -36,7 +40,9 @@ describe('UserRoleRelations service', () => {
     const relations = result.right();
 
     expect(relations.length).toBeGreaterThan(0);
-    expect(relations.every(Boolean)).toBe(true);
+    relations.every(relation => {
+      expect(relation.userId).toBe(userId);
+    });
   });
 
   it('should return "RoleRelationNotFoundError" in case if relation not found', async () => {
@@ -54,10 +60,20 @@ describe('UserRoleRelations service', () => {
       userId: new ObjectID().toHexString(),
     };
 
-    const createdRel = await userRoleRelService.create(rel);
+    const result = await userRoleRelService.create(rel);
+    const createdRel = result.right();
 
     expect(createdRel.roleId).toBe(rel.roleId);
     expect(createdRel.userId).toBe(rel.userId);
+  });
+
+  it('should return "RoleRelationAlreadyExistsError" if relation already exists', async () => {
+    const existingRelation = sample(mockRelations);
+
+    const result = await userRoleRelService.create(existingRelation);
+    const error = result.left();
+
+    expect(error).toBeInstanceOf(RoleRelationAlreadyExistsError);
   });
 
   it('should remove specific relation by id', async () => {

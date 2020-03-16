@@ -4,7 +4,11 @@ import { Model } from 'mongoose';
 import { UserRoleRelDocument } from './schema/user-role-rel.schema';
 import { IUserRoleRelationMapper, IUserRoleRelService } from './interfaces/interfaces';
 import { Either, Left, Right } from 'monet';
-import { RoleRelationNotFoundError, RelationNotFoundError } from './errors/errors';
+import {
+  RoleRelationNotFoundError,
+  RelationNotFoundError,
+  RoleRelationAlreadyExistsError,
+} from './errors/errors';
 
 export class UserRoleRelationMapper implements IUserRoleRelationMapper {
   fromEntity(entity: any): UserRoleRelation {
@@ -24,9 +28,25 @@ export class UserRoleRelService implements IUserRoleRelService {
     private readonly mapper: IUserRoleRelationMapper,
   ) {}
 
-  async create(relation: UserRoleRelationForCreate): Promise<UserRoleRelation> {
+  private async checkExistence(relation: UserRoleRelationForCreate): Promise<boolean> {
+    const relations = await this.relationModel.find({
+      roleId: relation.roleId,
+      userId: relation.userId,
+    });
+    return relations.length ? true : false;
+  }
+
+  async create(
+    relation: UserRoleRelationForCreate,
+  ): Promise<Either<RoleRelationAlreadyExistsError, UserRoleRelation>> {
+    const isRelationExists = await this.checkExistence(relation);
+
+    if (isRelationExists) {
+      return Left(new RoleRelationAlreadyExistsError(relation.roleId));
+    }
+
     const created = await this.relationModel.create(relation);
-    return this.mapper.fromEntity(created);
+    return Right(this.mapper.fromEntity(created));
   }
 
   async getAll(): Promise<UserRoleRelation[]> {
@@ -34,13 +54,11 @@ export class UserRoleRelService implements IUserRoleRelService {
     return relations.map(this.mapper.fromEntity);
   }
 
-  async getByAccount(
-    userId: string,
-  ): Promise<Either<RoleRelationNotFoundError, UserRoleRelation[]>> {
-    const relations = await this.relationModel.find({ userId });
+  async getByAccount(id: string): Promise<Either<RoleRelationNotFoundError, UserRoleRelation[]>> {
+    const relations = await this.relationModel.find({ userId: id });
 
     if (!relations.length) {
-      return Left(new RoleRelationNotFoundError(userId));
+      return Left(new RoleRelationNotFoundError(id));
     }
     return Right(relations.map(this.mapper.fromEntity));
   }

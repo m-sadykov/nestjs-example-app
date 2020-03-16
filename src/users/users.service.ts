@@ -68,10 +68,7 @@ export class UsersService implements IUsersService, OnModuleInit {
     const query = { username };
     const [user] = await this.usersRepo.getAll(query);
 
-    if (user) {
-      return true;
-    }
-    return false;
+    return Boolean(user);
   }
 
   private async createAdminUser(
@@ -106,10 +103,7 @@ export class UsersService implements IUsersService, OnModuleInit {
     return this.usersRepo.findOne(id);
   }
 
-  async addUser(
-    user: UserForCreate,
-    roleId: string,
-  ): Promise<Either<UserAlreadyExistsError, User>> {
+  async addUser(user: UserForCreate): Promise<Either<UserAlreadyExistsError, User>> {
     const { username } = user;
     const isUserExists = await this.isUserAlreadyExists(username);
 
@@ -118,8 +112,6 @@ export class UsersService implements IUsersService, OnModuleInit {
     }
 
     const createdUser = await this.usersRepo.create(user);
-    await this.userRoleRelService.create({ userId: createdUser.id, roleId });
-
     return Right(createdUser);
   }
 

@@ -10,7 +10,7 @@ const mapper = new RolesMapper();
 export async function getMockRoles() {
   const roles: Role[] = [];
 
-  for (let index = 0; index < 10; index++) {
+  for (let index = 1; index < 10; index++) {
     const role: RoleForCreate = {
       name: `role_${index}`,
       displayName: faker.lorem.word().toUpperCase(),
