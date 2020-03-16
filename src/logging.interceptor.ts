@@ -30,6 +30,7 @@ export class LoggingInterceptor implements NestInterceptor {
           url,
           method,
           message: error.message,
+          stack: error.stack,
         });
 
         throw new InternalServerErrorException({

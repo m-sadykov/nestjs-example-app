@@ -55,7 +55,7 @@ describe('Roles service', () => {
     });
   });
 
-  describe('read', () => {
+  describe('get', () => {
     it('should get all roles', async () => {
       const roles = await rolesService.getAll();
 

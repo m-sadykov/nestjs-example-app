@@ -27,70 +27,76 @@ describe('UserRoleRelations service', () => {
     await closeDbConnection();
   });
 
-  it('should get all relations', async () => {
-    const relations = await userRoleRelService.getAll();
+  describe('get', () => {
+    it('should get all relations', async () => {
+      const relations = await userRoleRelService.getAll();
 
-    expect(relations.length).toBeGreaterThan(0);
-  });
+      expect(relations.length).toBeGreaterThan(0);
+    });
 
-  it('should get specific relation by userId', async () => {
-    const userId = sample(mockRelations).userId;
+    it('should get specific relation by userId', async () => {
+      const userId = sample(mockRelations).userId;
 
-    const result = await userRoleRelService.getByAccount(userId);
-    const relations = result.right();
+      const result = await userRoleRelService.getByAccount(userId);
+      const relations = result.right();
 
-    expect(relations.length).toBeGreaterThan(0);
-    relations.every(relation => {
-      expect(relation.userId).toBe(userId);
+      expect(relations.length).toBeGreaterThan(0);
+      relations.every(relation => {
+        expect(relation.userId).toBe(userId);
+      });
+    });
+
+    it('should return "RoleRelationNotFoundError" in case if relation not found', async () => {
+      const userId = new ObjectID().toHexString();
+
+      const result = await userRoleRelService.getByAccount(userId);
+      const error = result.left();
+
+      expect(error).toBeInstanceOf(RoleRelationNotFoundError);
     });
   });
 
-  it('should return "RoleRelationNotFoundError" in case if relation not found', async () => {
-    const userId = new ObjectID().toHexString();
+  describe('create', () => {
+    it('should create new relation', async () => {
+      const rel: UserRoleRelationForCreate = {
+        roleId: new ObjectID().toHexString(),
+        userId: new ObjectID().toHexString(),
+      };
 
-    const result = await userRoleRelService.getByAccount(userId);
-    const error = result.left();
+      const result = await userRoleRelService.create(rel);
+      const createdRel = result.right();
 
-    expect(error).toBeInstanceOf(RoleRelationNotFoundError);
+      expect(createdRel.roleId).toBe(rel.roleId);
+      expect(createdRel.userId).toBe(rel.userId);
+    });
+
+    it('should return "RoleRelationAlreadyExistsError" if relation already exists', async () => {
+      const existingRelation = sample(mockRelations);
+
+      const result = await userRoleRelService.create(existingRelation);
+      const error = result.left();
+
+      expect(error).toBeInstanceOf(RoleRelationAlreadyExistsError);
+    });
   });
 
-  it('should create new relation', async () => {
-    const rel: UserRoleRelationForCreate = {
-      roleId: new ObjectID().toHexString(),
-      userId: new ObjectID().toHexString(),
-    };
+  describe('delete', () => {
+    it('should remove specific relation by id', async () => {
+      const id = sample(mockRelations).id;
 
-    const result = await userRoleRelService.create(rel);
-    const createdRel = result.right();
+      const result = await userRoleRelService.delete(id);
+      const removedRelation = result.right();
 
-    expect(createdRel.roleId).toBe(rel.roleId);
-    expect(createdRel.userId).toBe(rel.userId);
-  });
+      expect(removedRelation.isDeleted).toBe(true);
+    });
 
-  it('should return "RoleRelationAlreadyExistsError" if relation already exists', async () => {
-    const existingRelation = sample(mockRelations);
+    it('should return "RelationNotFoundError" if relation for delete not found', async () => {
+      const id = new ObjectID().toHexString();
 
-    const result = await userRoleRelService.create(existingRelation);
-    const error = result.left();
+      const result = await userRoleRelService.delete(id);
+      const error = result.left();
 
-    expect(error).toBeInstanceOf(RoleRelationAlreadyExistsError);
-  });
-
-  it('should remove specific relation by id', async () => {
-    const id = sample(mockRelations).id;
-
-    const result = await userRoleRelService.delete(id);
-    const removedRelation = result.right();
-
-    expect(removedRelation.isDeleted).toBe(true);
-  });
-
-  it('should return "RelationNotFoundError" if relation for delete not found', async () => {
-    const id = new ObjectID().toHexString();
-
-    const result = await userRoleRelService.delete(id);
-    const error = result.left();
-
-    expect(error).toBeInstanceOf(RelationNotFoundError);
+      expect(error).toBeInstanceOf(RelationNotFoundError);
+    });
   });
 });
